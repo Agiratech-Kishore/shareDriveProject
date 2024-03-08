@@ -50,4 +50,5 @@ public class UserService {
         existingUser.setDeleted(true);
         userRepository.save(existingUser);
     }
+
 }

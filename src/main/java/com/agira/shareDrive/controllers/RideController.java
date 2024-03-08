@@ -3,7 +3,6 @@ package com.agira.shareDrive.controllers;
 import com.agira.shareDrive.dtos.rideDto.RideRequestDto;
 import com.agira.shareDrive.dtos.rideDto.RideRequestResponseDto;
 import com.agira.shareDrive.dtos.rideDto.RideResponseDto;
-import com.agira.shareDrive.entities.Ride;
 import com.agira.shareDrive.services.RideService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,4 +55,9 @@ public class RideController {
         RideRequestResponseDto rideRequestResponseDto = rideService.createRideRequest(user, ride);
         return ResponseEntity.ok(rideRequestResponseDto);
     }
+    @GetMapping("/ride-requests/{userId}")
+    public ResponseEntity<List<RideRequestResponseDto>> getAllRideRequests(@PathVariable("userId") int userId) {
+            List<RideRequestResponseDto> rideRequestResponseDtos = rideService.getAllRideRequest(userId);
+            return new ResponseEntity<>(rideRequestResponseDtos, HttpStatus.OK);
+        }
 }

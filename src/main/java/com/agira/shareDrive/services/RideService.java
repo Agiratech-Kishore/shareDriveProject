@@ -13,7 +13,6 @@ import com.agira.shareDrive.utility.RideMapper;
 import com.agira.shareDrive.utility.UserMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -32,6 +31,7 @@ public class RideService {
     private RideRequestRepository rideRequestRepository;
     @Autowired
     private UserMapper userMapper;
+
     public RideResponseDto createRide(RideRequestDto rideRequestDto) {
         User user = userService.getUserById(rideRequestDto.getUserId());
         Ride ride = rideMapper.rideRequestDtoToRide(rideRequestDto);
@@ -39,6 +39,7 @@ public class RideService {
         Ride createdRide = rideRepository.save(ride);
         return rideMapper.rideToRideResponseDto(ride);
     }
+
     public List<RideResponseDto> getAllRides() {
         List<Ride> rides = rideRepository.findAll();
         return rides.stream().map(ride -> rideMapper.rideToRideResponseDto(ride)).collect(Collectors.toList());
@@ -80,17 +81,18 @@ public class RideService {
         }
     }
 
-    public List<RideResponseDto> getRideByOriginAndDestination(String origin, String destination){
+    public List<RideResponseDto> getRideByOriginAndDestination(String origin, String destination) {
         return rideRepository.findByOriginEqualsAndDestinationEquals(origin, destination).stream().map(ride -> {
             Ride ride1 = ride.get();
             RideResponseDto rideResponseDto = new RideResponseDto();
             return rideMapper.rideToRideResponseDto(ride1);
         }).collect(Collectors.toList());
     }
-    public RideRequestResponseDto createRideRequest(int userId,int rideId){
+
+    public RideRequestResponseDto createRideRequest(int userId, int rideId) {
         User user = userService.getUserById(userId);
         Optional<Ride> rideOptional = rideRepository.findById(rideId);
-        if(!rideOptional.isPresent()){
+        if (rideOptional.isEmpty()) {
             throw new RuntimeException("Ride not found with id: " + id);
         }
         Ride ride = rideOptional.get();
@@ -99,11 +101,27 @@ public class RideService {
         rideRequest.setRide(ride);
         rideRequest.setStatus("Pending");
         RideRequest savedRideRequest = rideRequestRepository.save(rideRequest);
+        ride.getRideRequests().add(savedRideRequest);
+        rideRepository.save(ride);
         RideResponseDto rideResponseDto = rideMapper.rideToRideResponseDto(savedRideRequest.getRide());
         UserResponseDto userResponseDto = userMapper.userToUserResponseDto(savedRideRequest.getRequester());
         RideRequestResponseDto rideRequestResponseDto = new RideRequestResponseDto();
         rideRequestResponseDto.setRideDetails(rideResponseDto);
         rideRequestResponseDto.setUserDetails(userResponseDto);
         return rideRequestResponseDto;
+    }
+
+    public List<RideRequestResponseDto> getAllRideRequest(int userId) {
+        User user = userService.getUserById(userId);
+        List<RideRequest> rideRequests = user.getRideRequests();
+        return rideRequests.stream().map(rideRequest -> {
+                    RideResponseDto rideResponseDto = rideMapper.rideToRideResponseDto(rideRequest.getRide());
+                    UserResponseDto userResponseDto = userMapper.userToUserResponseDto(rideRequest.getRequester());
+                    RideRequestResponseDto rideRequestResponseDto = new RideRequestResponseDto();
+                    rideRequestResponseDto.setRideDetails(rideResponseDto);
+                    rideRequestResponseDto.setUserDetails(userResponseDto);
+                    return rideRequestResponseDto;
+                })
+                .collect(Collectors.toList());
     }
 }

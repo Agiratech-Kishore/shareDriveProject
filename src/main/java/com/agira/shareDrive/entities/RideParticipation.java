@@ -7,7 +7,6 @@ public class RideParticipation {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
