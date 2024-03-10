@@ -1,4 +1,4 @@
-package com.agira.shareDrive.entities;
+package com.agira.shareDrive.model;
 
 import jakarta.persistence.*;
 
@@ -12,4 +12,6 @@ public class RideParticipation {
     private User user;
     @ManyToOne
     private Ride ride;
+    private boolean is_driver;
+    private String status;
 }

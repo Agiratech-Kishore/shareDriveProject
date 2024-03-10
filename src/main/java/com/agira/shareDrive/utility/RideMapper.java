@@ -2,8 +2,7 @@ package com.agira.shareDrive.utility;
 
 import com.agira.shareDrive.dtos.rideDto.RideRequestDto;
 import com.agira.shareDrive.dtos.rideDto.RideResponseDto;
-import com.agira.shareDrive.dtos.userDto.UserResponseDto;
-import com.agira.shareDrive.entities.Ride;
+import com.agira.shareDrive.model.Ride;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RequestBody;

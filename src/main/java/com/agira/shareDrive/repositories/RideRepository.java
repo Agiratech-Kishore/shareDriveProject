@@ -1,6 +1,6 @@
 package com.agira.shareDrive.repositories;
 
-import com.agira.shareDrive.entities.Ride;
+import com.agira.shareDrive.model.Ride;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

@@ -1,4 +1,4 @@
-package com.agira.shareDrive.entities;
+package com.agira.shareDrive.model;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -6,25 +6,21 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-
-@Entity
-@Table(name = "ride_requests")
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class RideRequest {
+@Entity
+public class Vehicle {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-
+    private String make;
+    private String model;
+    private int capacity;
+    private String licensePlate;
     @ManyToOne
-    @JoinColumn(name = "ride_id")
-    private Ride ride;
-
-    @ManyToOne
-    @JoinColumn(name = "requester_id")
-    private User requester;
-
-    private String status;
+    @JoinColumn(name = "user_id")
+    private User user;
+    private boolean deleted;
 }

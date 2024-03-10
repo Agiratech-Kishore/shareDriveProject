@@ -2,7 +2,7 @@ package com.agira.shareDrive.services;
 
 import com.agira.shareDrive.dtos.userDto.UserRequestDto;
 import com.agira.shareDrive.dtos.userDto.UserResponseDto;
-import com.agira.shareDrive.entities.User;
+import com.agira.shareDrive.model.User;
 import com.agira.shareDrive.repositories.UserRepository;
 import com.agira.shareDrive.utility.UserMapper;
 import org.springframework.beans.factory.annotation.Autowired;

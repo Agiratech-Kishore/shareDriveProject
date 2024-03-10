@@ -1,4 +1,4 @@
-package com.agira.shareDrive.entities;
+package com.agira.shareDrive.model;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -7,8 +7,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.sql.Time;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 

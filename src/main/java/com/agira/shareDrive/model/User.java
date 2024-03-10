@@ -1,4 +1,4 @@
-package com.agira.shareDrive.entities;
+package com.agira.shareDrive.model;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

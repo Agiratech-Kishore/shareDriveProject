@@ -1,10 +1,8 @@
 package com.agira.shareDrive.utility;
 
-import com.agira.shareDrive.dtos.userDto.UserRequestDto;
 import com.agira.shareDrive.dtos.vehicleDto.VehicleRequestDto;
 import com.agira.shareDrive.dtos.vehicleDto.VehicleResponseDto;
-import com.agira.shareDrive.entities.User;
-import com.agira.shareDrive.entities.Vehicle;
+import com.agira.shareDrive.model.Vehicle;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RequestBody;
 
