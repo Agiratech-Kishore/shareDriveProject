@@ -1,5 +1,6 @@
 package com.agira.shareDrive.services;
 
+import com.agira.shareDrive.appconfig.TokenProvider;
 import com.agira.shareDrive.dtos.loginLogout.LoginRequestDto;
 import com.agira.shareDrive.dtos.loginLogout.LoginResponseDto;
 import com.agira.shareDrive.dtos.userDto.UserRequestDto;
@@ -7,7 +8,12 @@ import com.agira.shareDrive.dtos.userDto.UserResponseDto;
 import com.agira.shareDrive.model.User;
 import com.agira.shareDrive.repositories.UserRepository;
 import com.agira.shareDrive.utility.UserMapper;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -16,7 +22,9 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
-public class UserService {
+@AllArgsConstructor
+@NoArgsConstructor
+public class UserService{
 
     @Autowired
     private UserRepository userRepository;
@@ -25,6 +33,10 @@ public class UserService {
     private UserMapper userMapper;
     @Autowired
     private PasswordEncoder passwordEncoder;
+    @Autowired
+    AuthenticationManager authenticationManager;
+    @Autowired
+    private TokenProvider tokenProvider;
 
     public UserResponseDto createUser(UserRequestDto userRequestDto) {
         User user = userMapper.userRequestDtoToUser(userRequestDto);
@@ -59,25 +71,33 @@ public class UserService {
         userRepository.save(existingUser);
     }
 
-    public LoginResponseDto loginUser(LoginRequestDto loginRequestDto) {
-        String msg = "";
-        User user1 = userRepository.findByEmail(loginRequestDto.getEmail());
-        if(user1!=null){
-            String plainPassword = loginRequestDto.getPassword();
-            String encodedPassword = user1.getPassword();
-            Boolean isPwdRight = passwordEncoder.matches(plainPassword,encodedPassword);
-            if(isPwdRight){
-               Optional<User> user = userRepository.findOneByEmailAndPassword(loginRequestDto.getEmail(),loginRequestDto.getPassword());
-               if(user.isPresent()){
-                   return new LoginResponseDto("Login Success",true);
-               } else {
-                   return new LoginResponseDto("Login Failed",false);
-               }
-            } else {
-                return new LoginResponseDto("Password Not Match",false);
-            }
-        } else {
-            return new LoginResponseDto("Email not exists",false);
-        }
+//    public LoginResponseDto loginUser(LoginRequestDto loginRequestDto) {
+//        String msg = "";
+//        User user1 = userRepository.findByEmail(loginRequestDto.getEmail());
+//        if(user1!=null){
+//            String plainPassword = loginRequestDto.getPassword();
+//            String encodedPassword = user1.getPassword();
+//            Boolean isPwdRight = passwordEncoder.matches(plainPassword,encodedPassword);
+//            if(isPwdRight){
+//               Optional<User> user = userRepository.findOneByEmailAndPassword(loginRequestDto.getEmail(),loginRequestDto.getPassword());
+//               if(user.isPresent()){
+//                   return new LoginResponseDto("Login Success",true);
+//               } else {
+//                   return new LoginResponseDto("Login Failed",false);
+//               }
+//            } else {
+//                return new LoginResponseDto("Password Not Match",false);
+//            }
+//        } else {
+//            return new LoginResponseDto("Email not exists",false);
+//        }
+//    }
+
+    public LoginResponseDto loginUser(LoginRequestDto loginRequestDto){
+        Authentication authentication=null;
+        authentication=authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequestDto.getEmail(),loginRequestDto.getPassword()));
+
+        return new LoginResponseDto("Login Success",tokenProvider.generateToken(authentication));
     }
+
 }

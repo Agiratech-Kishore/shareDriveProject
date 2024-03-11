@@ -5,6 +5,7 @@ import com.agira.shareDrive.dtos.rideDto.RideRequestResponseDto;
 import com.agira.shareDrive.dtos.rideDto.RideResponseDto;
 import com.agira.shareDrive.services.RideService;
 import jakarta.validation.Valid;
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +15,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/ride")
+@AllArgsConstructor
 public class RideController {
     @Autowired
     private RideService rideService;

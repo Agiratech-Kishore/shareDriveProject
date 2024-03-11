@@ -16,9 +16,9 @@ public class PasswordValidator implements ConstraintValidator<ValidPassword, Str
             return false;
         }
         boolean hasNumber = password.matches(".*\\d.*");
-        
+
         boolean hasCapitalLetter = password.matches(".*[A-Z].*");
-        
+
         boolean hasMinLength = password.length() >= 6;
 
         return hasNumber && hasCapitalLetter && hasMinLength;

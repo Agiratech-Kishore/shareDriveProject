@@ -12,4 +12,7 @@ import lombok.Setter;
 public class LoginResponseDto {
     String message;
     Boolean status;
+
+    public LoginResponseDto(String loginSuccess, String s) {
+    }
 }
