@@ -31,7 +31,5 @@ public class Ride {
     private Time time;
     @OneToMany(mappedBy = "ride")
     private List<RideRequest> rideRequests;
-    @OneToMany(mappedBy = "ride")
-    private List<RideParticipation> rideParticipations;
     private boolean deleted;
 }

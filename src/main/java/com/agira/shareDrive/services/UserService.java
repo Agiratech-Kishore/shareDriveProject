@@ -1,14 +1,18 @@
 package com.agira.shareDrive.services;
 
+import com.agira.shareDrive.dtos.loginLogout.LoginRequestDto;
+import com.agira.shareDrive.dtos.loginLogout.LoginResponseDto;
 import com.agira.shareDrive.dtos.userDto.UserRequestDto;
 import com.agira.shareDrive.dtos.userDto.UserResponseDto;
 import com.agira.shareDrive.model.User;
 import com.agira.shareDrive.repositories.UserRepository;
 import com.agira.shareDrive.utility.UserMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -19,9 +23,13 @@ public class UserService {
 
     @Autowired
     private UserMapper userMapper;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     public UserResponseDto createUser(UserRequestDto userRequestDto) {
         User user = userMapper.userRequestDtoToUser(userRequestDto);
+        String encodedPassword = passwordEncoder.encode(userRequestDto.getPassWord());
+        user.setPassword(encodedPassword);
         User savedUser = userRepository.save(user);
         return userMapper.userToUserResponseDto(savedUser);
     }
@@ -51,4 +59,25 @@ public class UserService {
         userRepository.save(existingUser);
     }
 
+    public LoginResponseDto loginUser(LoginRequestDto loginRequestDto) {
+        String msg = "";
+        User user1 = userRepository.findByEmail(loginRequestDto.getEmail());
+        if(user1!=null){
+            String plainPassword = loginRequestDto.getPassword();
+            String encodedPassword = user1.getPassword();
+            Boolean isPwdRight = passwordEncoder.matches(plainPassword,encodedPassword);
+            if(isPwdRight){
+               Optional<User> user = userRepository.findOneByEmailAndPassword(loginRequestDto.getEmail(),loginRequestDto.getPassword());
+               if(user.isPresent()){
+                   return new LoginResponseDto("Login Success",true);
+               } else {
+                   return new LoginResponseDto("Login Failed",false);
+               }
+            } else {
+                return new LoginResponseDto("Password Not Match",false);
+            }
+        } else {
+            return new LoginResponseDto("Email not exists",false);
+        }
+    }
 }

@@ -20,14 +20,13 @@ public class User {
     private String email;
     private Integer age;
     private String mobileNumber;
+    private String password;
     @OneToMany(mappedBy = "driver")
     private List<Ride> ridesAsDriver;
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL,mappedBy = "user" )
     private List<Vehicle> vehicles;
     @OneToMany(mappedBy = "requester")
     private List<RideRequest> rideRequests;
-    @OneToMany(mappedBy = "user")
-    private List<RideParticipation> rideParticipations;
     @ManyToMany
     private List<Ride> rides;
     private boolean deleted;

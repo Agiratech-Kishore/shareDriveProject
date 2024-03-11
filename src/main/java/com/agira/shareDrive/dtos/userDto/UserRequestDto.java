@@ -1,5 +1,6 @@
 package com.agira.shareDrive.dtos.userDto;
 
+import com.agira.shareDrive.validatePassword.ValidPassword;
 import jakarta.validation.constraints.*;
 import lombok.*;
 
@@ -19,4 +20,7 @@ public class UserRequestDto {
     @Size(min = 10, max = 10, message = "Mobile number should be 10 digit")
     @NotBlank(message = "Mobile number should not be blank")
     private String mobileNumber;
+    @NotBlank(message = "Password should not be blank")
+    @ValidPassword(message = "A minimum 6 characters password contains a combination of uppercase and lowercase letter and number are required.")
+    private String passWord;
 }

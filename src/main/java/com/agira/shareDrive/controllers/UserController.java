@@ -1,5 +1,7 @@
 package com.agira.shareDrive.controllers;
 
+import com.agira.shareDrive.dtos.loginLogout.LoginRequestDto;
+import com.agira.shareDrive.dtos.loginLogout.LoginResponseDto;
 import com.agira.shareDrive.dtos.userDto.UserRequestDto;
 import com.agira.shareDrive.dtos.userDto.UserResponseDto;
 import com.agira.shareDrive.repositories.UserRepository;
@@ -48,5 +50,10 @@ public class UserController {
     public ResponseEntity<Void> deleteUser(@PathVariable int id) {
         userService.deleteUser(id);
         return ResponseEntity.noContent().build();
+    }
+    @PostMapping("/login")
+    public ResponseEntity<?> loginUser(@RequestBody LoginRequestDto loginRequestDto){
+        LoginResponseDto loginResponseDto = userService.loginUser(loginRequestDto);
+        return ResponseEntity.ok(loginResponseDto);
     }
 }
