@@ -26,5 +26,5 @@ public class RideRequest {
     @JoinColumn(name = "requester_id")
     private User requester;
 
-    private String status;
+    private String status = Approval.PENDING;
 }

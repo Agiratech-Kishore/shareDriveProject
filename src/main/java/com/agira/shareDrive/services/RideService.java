@@ -102,7 +102,6 @@ public class RideService {
         RideRequest rideRequest = new RideRequest();
         rideRequest.setRequester(user);
         rideRequest.setRide(ride);
-        rideRequest.setStatus("Pending");
         RideRequest savedRideRequest = rideRequestRepository.save(rideRequest);
         ride.getRideRequests().add(savedRideRequest);
         rideRepository.save(ride);
@@ -120,11 +119,37 @@ public class RideService {
         return rideRequests.stream().map(rideRequest -> {
                     RideResponseDto rideResponseDto = rideMapper.rideToRideResponseDto(rideRequest.getRide());
                     UserResponseDto userResponseDto = userMapper.userToUserResponseDto(rideRequest.getRequester());
-                    RideRequestResponseDto rideRequestResponseDto = new RideRequestResponseDto();
-                    rideRequestResponseDto.setRideDetails(rideResponseDto);
-                    rideRequestResponseDto.setUserDetails(userResponseDto);
-                    return rideRequestResponseDto;
+                    return RideRequestResponseDto.builder().
+                            rideDetails(rideResponseDto).
+                            userDetails(userResponseDto).
+                            status(rideRequest.getStatus()).
+                            id(rideRequest.getId()).build();
                 })
                 .collect(Collectors.toList());
+    }
+
+    public RideRequestResponseDto acceptOrDenyRideRequest(Integer id, String approval) throws RideRequestNotFoundException {
+        Optional<RideRequest> rideRequestOptional = rideRequestRepository.findById(id);
+        if (rideRequestOptional.isEmpty()) {
+            throw new RideRequestNotFoundException("No Ride found with id: " + id);
+        }
+        RideRequest rideRequest = rideRequestOptional.get();
+        if (approval.equalsIgnoreCase("Accept")) {
+            rideRequest.setStatus(Approval.ACCEPT);
+            Ride ride = rideRequest.getRide();
+            ride.setNoOfPassengers(ride.getNoOfPassengers() - 1);
+            rideRepository.save(ride);
+        } else {
+            rideRequest.setStatus(Approval.REJECT);
+        }
+        RideRequest modifiedRideRequest = rideRequestRepository.save(rideRequest);
+        RideResponseDto rideResponseDto = rideMapper.rideToRideResponseDto(modifiedRideRequest.getRide());
+        UserResponseDto userResponseDto = userMapper.userToUserResponseDto(modifiedRideRequest.getRequester());
+        return RideRequestResponseDto.builder()
+                .id(modifiedRideRequest.getId())
+                .status(modifiedRideRequest.getStatus())
+                .userDetails(userResponseDto)
+                .rideDetails(rideResponseDto)
+                .build();
     }
 }

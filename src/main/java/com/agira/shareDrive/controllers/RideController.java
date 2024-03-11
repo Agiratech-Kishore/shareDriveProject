@@ -59,5 +59,11 @@ public class RideController {
     public ResponseEntity<List<RideRequestResponseDto>> getAllRideRequests(@PathVariable("userId") int userId) {
             List<RideRequestResponseDto> rideRequestResponseDtos = rideService.getAllRideRequest(userId);
             return new ResponseEntity<>(rideRequestResponseDtos, HttpStatus.OK);
-        }
+    }
+
+    @PatchMapping("/{rideId}/{approval}")
+    public ResponseEntity<RideRequestResponseDto> acceptOrRejectRideRequest(@PathVariable int rideId, @PathVariable String approval){
+        RideRequestResponseDto rideRequestResponseDto = rideService.acceptOrDenyRideRequest(rideId, approval);
+        return new ResponseEntity<>(rideRequestResponseDto, HttpStatus.OK);
+    }
 }
