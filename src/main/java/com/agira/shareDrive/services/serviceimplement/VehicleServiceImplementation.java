@@ -1,10 +1,12 @@
-package com.agira.shareDrive.services;
+package com.agira.shareDrive.services.serviceimplement;
 
 import com.agira.shareDrive.dtos.vehicleDto.VehicleRequestDto;
 import com.agira.shareDrive.dtos.vehicleDto.VehicleResponseDto;
+import com.agira.shareDrive.exceptions.UserNotFoundException;
 import com.agira.shareDrive.model.User;
 import com.agira.shareDrive.model.Vehicle;
 import com.agira.shareDrive.repositories.VehicleRepository;
+import com.agira.shareDrive.services.service.VehicleService;
 import com.agira.shareDrive.utility.VehicleMapper;
 import org.springframework.stereotype.Service;
 
@@ -13,7 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.Optional;
 
 @Service
-public class VehicleService {
+public class VehicleServiceImplementation implements VehicleService {
 
     @Autowired
     private VehicleRepository vehicleRepository;
@@ -22,9 +24,9 @@ public class VehicleService {
     private VehicleMapper vehicleMapper;
 
     @Autowired
-    private UserService userService;
+    private UserServiceImplementation userService;
 
-    public VehicleResponseDto createVehicle(VehicleRequestDto vehicleRequestDto) {
+    public VehicleResponseDto createVehicle(VehicleRequestDto vehicleRequestDto) throws UserNotFoundException {
         User user = userService.getUserById(vehicleRequestDto.getUserId());
         Vehicle vehicle = vehicleMapper.vehicleRequestDtoToVehicle(vehicleRequestDto);
         vehicle.setUser(user);
@@ -41,7 +43,7 @@ public class VehicleService {
         }
     }
 
-    public VehicleResponseDto updateVehicle(Integer id, VehicleRequestDto vehicleRequestDto) {
+    public VehicleResponseDto updateVehicle(Integer id, VehicleRequestDto vehicleRequestDto) throws UserNotFoundException {
         Optional<Vehicle> existingVehicleOptional = vehicleRepository.findById(id);
         if (existingVehicleOptional.isPresent()) {
             Vehicle existingVehicle = existingVehicleOptional.get();

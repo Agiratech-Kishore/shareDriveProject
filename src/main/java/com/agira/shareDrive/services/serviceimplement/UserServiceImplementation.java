@@ -1,30 +1,34 @@
-package com.agira.shareDrive.services;
+package com.agira.shareDrive.services.serviceimplement;
 
 import com.agira.shareDrive.appconfig.TokenProvider;
 import com.agira.shareDrive.dtos.loginLogout.LoginRequestDto;
 import com.agira.shareDrive.dtos.loginLogout.LoginResponseDto;
 import com.agira.shareDrive.dtos.userDto.UserRequestDto;
 import com.agira.shareDrive.dtos.userDto.UserResponseDto;
+import com.agira.shareDrive.exceptions.UserNotFoundException;
 import com.agira.shareDrive.model.User;
 import com.agira.shareDrive.repositories.UserRepository;
+import com.agira.shareDrive.services.service.UserService;
 import com.agira.shareDrive.utility.UserMapper;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserService{
+public class UserServiceImplementation implements UserService {
 
     @Autowired
     private UserRepository userRepository;
@@ -37,38 +41,53 @@ public class UserService{
     AuthenticationManager authenticationManager;
     @Autowired
     private TokenProvider tokenProvider;
-
+    @Autowired
+    private JavaMailSender javaMailSender;
     public UserResponseDto createUser(UserRequestDto userRequestDto) {
         User user = userMapper.userRequestDtoToUser(userRequestDto);
-        String encodedPassword = passwordEncoder.encode(userRequestDto.getPassWord());
+        String encodedPassword = passwordEncoder.encode(userRequestDto.getPassword());
         user.setPassword(encodedPassword);
         User savedUser = userRepository.save(user);
+        SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
+        simpleMailMessage.setTo(user.getEmail());
+        simpleMailMessage.setSubject("Welcome to Agira share drive");
+        String mailTemplate = String.format("Dear %s,\n\nWelcome to Agira ShareDrive!\n\n", user.getName());
+        simpleMailMessage.setText(mailTemplate);
+        javaMailSender.send(simpleMailMessage);
         return userMapper.userToUserResponseDto(savedUser);
     }
-    public List<UserResponseDto> getAllUsers() {
+
+    @Override
+    public List<UserResponseDto> getAllUsers() throws UserNotFoundException {
         List<User> users = userRepository.findAll();
-        List<UserResponseDto> userResponseDtos = users.stream().map(user -> userMapper.userToUserResponseDto(user)).collect(Collectors.toList());
-        return userResponseDtos;
+        if (users.isEmpty()) {
+            throw new UserNotFoundException("No users found");
+        }
+        return users.stream().map(userMapper::userToUserResponseDto).collect(Collectors.toList());
     }
-    public UserResponseDto findUserById(int id) {
-        User user = userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found with id: " + id));
+
+    public UserResponseDto findUserById(int id) throws UserNotFoundException {
+        User user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("User not found with id: " + id));
         return userMapper.userToUserResponseDto(user);
     }
-    public User getUserById(int id) {
-        return userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found with id: " + id));
+
+    public User getUserById(int id) throws UserNotFoundException {
+        return userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("User not found with id: " + id));
     }
-    public UserResponseDto updateUser(int id, UserRequestDto userRequestDto) {
-        User existingUser = userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found with id: " + id));
+
+    public UserResponseDto updateUser(int id, UserRequestDto userRequestDto) throws UserNotFoundException {
+        User existingUser = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("User not found with id: " + id));
         User updatedUser = userMapper.userRequestDtoToUser(userRequestDto);
         updatedUser.setId(id);
         User savedUser = userRepository.save(updatedUser);
         return userMapper.userToUserResponseDto(savedUser);
     }
 
-    public void deleteUser(int id) {
-        User existingUser = userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found with id: " + id));
-        existingUser.setDeleted(true);
-        userRepository.save(existingUser);
+    @Override
+    public void deleteUser(int id) throws UserNotFoundException {
+        User existingUser = userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException("User not found with id: " + id));
+        userRepository.delete(existingUser);
     }
 
 //    public LoginResponseDto loginUser(LoginRequestDto loginRequestDto) {
@@ -93,11 +112,14 @@ public class UserService{
 //        }
 //    }
 
-    public LoginResponseDto loginUser(LoginRequestDto loginRequestDto){
-        Authentication authentication=null;
-        authentication=authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequestDto.getEmail(),loginRequestDto.getPassword()));
+    public LoginResponseDto loginUser(LoginRequestDto loginRequestDto) {
+        Authentication authentication = null;
+        authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequestDto.getEmail(), loginRequestDto.getPassword()));
 
-        return new LoginResponseDto("Login Success",tokenProvider.generateToken(authentication));
+//        return new LoginResponseDto("Login Success",tokenProvider.generateToken(authentication));
+        String token = tokenProvider.generateToken(authentication);
+        String message = "Login Successfull";
+        return new LoginResponseDto(token, message);
     }
 
 }

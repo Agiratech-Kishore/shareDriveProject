@@ -1,8 +1,8 @@
-package com.agira.shareDrive.services.security.service;
+package com.agira.shareDrive.security.service;
 
 import com.agira.shareDrive.model.User;
 import com.agira.shareDrive.repositories.UserRepository;
-import com.agira.shareDrive.services.security.model.CustomUserDetails;
+import com.agira.shareDrive.security.model.CustomUserDetails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

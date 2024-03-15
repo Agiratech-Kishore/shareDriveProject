@@ -17,7 +17,7 @@ public class RideMapper {
        ride.setTime(rideRequestDto.getTime());
        ride.setOrigin(rideRequestDto.getOrigin());
        ride.setDestination(rideRequestDto.getDestination());
-       ride.setNoOfPassengers(rideRequestDto.getPassengerCount());
+       ride.setAvailableSeats(rideRequestDto.getAvailableSeats());
        return ride;
     }
 
@@ -27,7 +27,7 @@ public class RideMapper {
        rideResponseDto.setDate(ride.getDate());
        rideResponseDto.setOrigin(String.valueOf(ride.getOrigin()));
        rideResponseDto.setDestination(String.valueOf(ride.getDestination()));
-       rideResponseDto.setPassengerCount(ride.getNoOfPassengers());
+       rideResponseDto.setAvailableSeats(ride.getAvailableSeats());
        rideResponseDto.setTime(ride.getTime());
        rideResponseDto.setPostedBy(userMapper.userToUserResponseDto(ride.getDriver()));
        return rideResponseDto;

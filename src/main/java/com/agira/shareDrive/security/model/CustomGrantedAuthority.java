@@ -1,4 +1,4 @@
-package com.agira.shareDrive.services.security.model;
+package com.agira.shareDrive.security.model;
 
 import com.agira.shareDrive.model.Role;
 import lombok.Getter;

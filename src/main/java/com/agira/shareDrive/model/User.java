@@ -22,15 +22,17 @@ public class User{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     private String name;
+    @Column(unique = true)
     private String email;
     private Integer age;
+    @Column(unique = true)
     private String mobileNumber;
     private String password;
     @OneToMany(mappedBy = "driver")
     private List<Ride> ridesAsDriver;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
     private List<Vehicle> vehicles;
-    @OneToMany(mappedBy = "requester")
+    @OneToMany(mappedBy = "requester",fetch = FetchType.LAZY,cascade = {CascadeType.REMOVE,CascadeType.MERGE})
     private List<RideRequest> rideRequests;
     @ManyToMany
     private List<Ride> rides;

@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.sql.Time;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.Date;
 import java.util.List;
 
@@ -24,11 +26,11 @@ public class Ride {
     private User driver;
     @ManyToMany(mappedBy = "rides")
     private List<User> passengers;
-    private int noOfPassengers;
+    private int availableSeats;
     private String origin;
     private String destination;
-    private Date date;
-    private Time time;
+    private LocalDate date;
+    private LocalTime time;
     @OneToMany(mappedBy = "ride")
     private List<RideRequest> rideRequests;
     private boolean deleted;

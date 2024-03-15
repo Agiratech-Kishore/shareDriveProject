@@ -9,6 +9,7 @@ import lombok.Setter;
 import java.sql.Date;
 import java.sql.Time;
 import java.time.LocalDate;
+import java.time.LocalTime;
 
 @Getter
 @Setter
@@ -25,14 +26,14 @@ public class RideRequestDto {
     private String destination;
 
     @Min(value = 1, message = "Passenger count must be at least 1")
-    private int passengerCount;
+    private int availableSeats;
 
     @NotNull(message = "Date must not be null")
     @FutureOrPresent(message = "Date must be in the present or future")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-    private Date date;
+    private LocalDate date;
 
     @NotNull(message = "Time must not be null")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm:ss")
-    private Time time;
+    private LocalTime time;
 }

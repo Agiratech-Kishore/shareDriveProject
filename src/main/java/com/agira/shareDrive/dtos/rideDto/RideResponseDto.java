@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.Date;
 import java.sql.Time;
 @Getter
@@ -16,8 +18,8 @@ public class RideResponseDto {
     private int id;
     private String origin;
     private String destination;
-    private int passengerCount;
-    private Date date;
-    private Time time;
+    private int availableSeats;
+    private LocalDate date;
+    private LocalTime time;
     private UserResponseDto postedBy;
 }

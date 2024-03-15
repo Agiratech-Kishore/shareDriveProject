@@ -18,6 +18,7 @@ public class Vehicle {
     private String make;
     private String model;
     private int capacity;
+    @Column(unique = true)
     private String licensePlate;
     @ManyToOne
     @JoinColumn(name = "user_id")

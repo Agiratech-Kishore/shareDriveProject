@@ -1,4 +1,4 @@
-package com.agira.shareDrive.services.security.model;
+package com.agira.shareDrive.security.model;
 
 import com.agira.shareDrive.model.User;
 import org.springframework.security.core.GrantedAuthority;
@@ -17,7 +17,7 @@ public class CustomUserDetails implements UserDetails {
     private boolean enabled;
     private List<GrantedAuthority> grantedAuthorities;
 
-    public CustomUserDetails(User user){
+    public CustomUserDetails(User user) {
         this.userName = user.getEmail();
         this.password = user.getPassword();
         this.accountNonExpired = true;

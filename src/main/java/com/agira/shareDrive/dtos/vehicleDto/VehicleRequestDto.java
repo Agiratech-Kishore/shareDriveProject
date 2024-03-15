@@ -1,5 +1,6 @@
 package com.agira.shareDrive.dtos.vehicleDto;
 
+import jakarta.persistence.Column;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -24,6 +25,7 @@ public class VehicleRequestDto {
 
     @NotBlank(message = "License plate should not be blank")
     @Size(max = 10, message = "License plate should be at most 10 characters")
+    @Column(unique = true)
     private String licensePlate;
 
     @NotNull(message = "User ID should not be null")

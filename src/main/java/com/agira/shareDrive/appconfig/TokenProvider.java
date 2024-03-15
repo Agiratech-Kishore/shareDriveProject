@@ -46,7 +46,9 @@ public class TokenProvider {
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
-        return claims.getSubject();
+        String subject = claims.getSubject();
+        System.out.println(subject);
+        return subject;
     }
 
     public boolean validateToken(String token) {
