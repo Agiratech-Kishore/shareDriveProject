@@ -18,6 +18,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/users")
+@CrossOrigin(origins = "http://localhost:4200")
 public class UserController {
     @Autowired
     private UserServiceImplementation userService;
@@ -26,7 +27,6 @@ public class UserController {
     @Autowired
     private UserRepository userRepository;
     @PostMapping
-    @CrossOrigin(origins = "http://localhost:4200/")
     public ResponseEntity<UserResponseDto> createUser(@Valid @RequestBody UserRequestDto userRequestDto) {
         UserResponseDto userResponseDto = userService.createUser(userRequestDto);
         return ResponseEntity.ok(userResponseDto);
@@ -54,7 +54,6 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
     @PostMapping("/login")
-    @CrossOrigin(origins = "http://localhost:4200/")
     public ResponseEntity<?> loginUser(@RequestBody LoginRequestDto loginRequestDto){
         LoginResponseDto loginResponseDto = userService.loginUser(loginRequestDto);
         return ResponseEntity.ok(loginResponseDto);

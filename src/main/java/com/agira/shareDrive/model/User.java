@@ -28,15 +28,16 @@ public class User{
     @Column(unique = true)
     private String mobileNumber;
     private String password;
-    @OneToMany(mappedBy = "driver")
+    @OneToMany(mappedBy = "driver",fetch = FetchType.EAGER)
     private List<Ride> ridesAsDriver;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "user",fetch = FetchType.EAGER)
     private List<Vehicle> vehicles;
     @OneToMany(mappedBy = "requester",fetch = FetchType.LAZY,cascade = {CascadeType.REMOVE,CascadeType.MERGE})
     private List<RideRequest> rideRequests;
     @ManyToMany
     private List<Ride> rides;
     private boolean deleted;
-    @ManyToMany
+    @ManyToMany(cascade = {CascadeType.PERSIST})
     private List<Role> roleList;
+
 }

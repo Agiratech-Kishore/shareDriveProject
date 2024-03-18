@@ -28,7 +28,6 @@ public class RideController {
         RideResponseDto rideResponseDto = rideServiceImplementation.createRide(rideRequestDto);
         return ResponseEntity.ok(rideResponseDto);
     }
-    @CrossOrigin(origins = "http://localhost:4200/")
     @GetMapping
     public ResponseEntity<List<RideResponseDto>> getAllRides() {
         List<RideResponseDto> rides = rideServiceImplementation.getAllRides();
@@ -68,9 +67,10 @@ public class RideController {
             return new ResponseEntity<>(rideRequestResponseDtos, HttpStatus.OK);
     }
 
-    @PatchMapping("/{rideId}/{approval}")
-    public ResponseEntity<RideRequestResponseDto> acceptOrRejectRideRequest(@PathVariable int rideId, @PathVariable String approval) throws RuntimeException{
-        RideRequestResponseDto rideRequestResponseDto = rideServiceImplementation.acceptOrDenyRideRequest(rideId, approval);
+    @PatchMapping("ride-request/{rideRequestId}")
+    public ResponseEntity<RideRequestResponseDto> acceptOrRejectRideRequest(@PathVariable int rideRequestId, @RequestParam String approval) throws RuntimeException{
+        RideRequestResponseDto rideRequestResponseDto = rideServiceImplementation.acceptOrDenyRideRequest(rideRequestId, approval);
         return new ResponseEntity<>(rideRequestResponseDto, HttpStatus.OK);
     }
+
 }
