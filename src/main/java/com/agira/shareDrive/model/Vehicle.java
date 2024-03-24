@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -24,4 +26,6 @@ public class Vehicle {
     @JoinColumn(name = "user_id")
     private User user;
     private boolean deleted;
+//    @OneToMany
+//    private List<String> imageUrl;
 }

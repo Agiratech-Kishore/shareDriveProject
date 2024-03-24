@@ -17,7 +17,7 @@ import java.util.List;
 
 
 @RestController
-@RequestMapping("/users")
+@RequestMapping("${api.version}/users")
 @CrossOrigin(origins = "http://localhost:4200")
 public class UserController {
     @Autowired
@@ -26,22 +26,25 @@ public class UserController {
     private UserMapper userMapper;
     @Autowired
     private UserRepository userRepository;
-    @PostMapping
+
+    @PostMapping("register")
     public ResponseEntity<UserResponseDto> createUser(@Valid @RequestBody UserRequestDto userRequestDto) {
         UserResponseDto userResponseDto = userService.createUser(userRequestDto);
         return ResponseEntity.ok(userResponseDto);
     }
 
     @GetMapping
-    public ResponseEntity<List<UserResponseDto>> getAllUsers() throws UserNotFoundException{
+    public ResponseEntity<List<UserResponseDto>> getAllUsers() throws UserNotFoundException {
         List<UserResponseDto> userResponseDtos = userService.getAllUsers();
         return ResponseEntity.ok(userResponseDtos);
     }
+
     @GetMapping("/{id}")
     public ResponseEntity<UserResponseDto> findUserById(@PathVariable int id) throws UserNotFoundException {
-       UserResponseDto userResponseDto = userService.findUserById(id);
+        UserResponseDto userResponseDto = userService.findUserById(id);
         return ResponseEntity.ok(userResponseDto);
     }
+
     @PutMapping("/{id}")
     public ResponseEntity<UserResponseDto> updateUser(@PathVariable int id, @Valid @RequestBody UserRequestDto userRequestDto) throws UserNotFoundException {
         UserResponseDto userResponseDto = userService.updateUser(id, userRequestDto);
@@ -53,9 +56,13 @@ public class UserController {
         userService.deleteUser(id);
         return ResponseEntity.noContent().build();
     }
+
     @PostMapping("/login")
-    public ResponseEntity<?> loginUser(@RequestBody LoginRequestDto loginRequestDto){
+    public ResponseEntity<UserResponseDto> loginUser(@RequestBody LoginRequestDto loginRequestDto) {
         LoginResponseDto loginResponseDto = userService.loginUser(loginRequestDto);
-        return ResponseEntity.ok(loginResponseDto);
+        String email = loginRequestDto.getEmail();
+        UserResponseDto userByEmail = userService.getUserByEmail(email);
+        userByEmail.setToken(loginResponseDto.getToken());
+        return ResponseEntity.ok(userByEmail);
     }
 }

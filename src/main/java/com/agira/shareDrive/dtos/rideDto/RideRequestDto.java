@@ -1,4 +1,5 @@
 package com.agira.shareDrive.dtos.rideDto;
+
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
@@ -36,4 +37,6 @@ public class RideRequestDto {
     @NotNull(message = "Time must not be null")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm:ss")
     private LocalTime time;
+
+    private Integer vehicleId;
 }

@@ -11,26 +11,29 @@ import org.springframework.web.bind.annotation.RequestBody;
 public class RideMapper {
     @Autowired
     private UserMapper userMapper;
-    public Ride rideRequestDtoToRide(@RequestBody RideRequestDto rideRequestDto){
-       Ride ride = new Ride();
-       ride.setDate(rideRequestDto.getDate());
-       ride.setTime(rideRequestDto.getTime());
-       ride.setOrigin(rideRequestDto.getOrigin());
-       ride.setDestination(rideRequestDto.getDestination());
-       ride.setAvailableSeats(rideRequestDto.getAvailableSeats());
-       return ride;
+
+    public Ride rideRequestDtoToRide(@RequestBody RideRequestDto rideRequestDto) {
+        Ride ride = new Ride();
+        ride.setDate(rideRequestDto.getDate());
+        ride.setTime(rideRequestDto.getTime());
+        ride.setOrigin(rideRequestDto.getOrigin());
+        ride.setDestination(rideRequestDto.getDestination());
+        ride.setAvailableSeats(rideRequestDto.getAvailableSeats());
+        return ride;
     }
 
-    public RideResponseDto rideToRideResponseDto(Ride ride){
-       RideResponseDto rideResponseDto = new RideResponseDto();
-       rideResponseDto.setId(ride.getId());
-       rideResponseDto.setDate(ride.getDate());
-       rideResponseDto.setOrigin(String.valueOf(ride.getOrigin()));
-       rideResponseDto.setDestination(String.valueOf(ride.getDestination()));
-       rideResponseDto.setAvailableSeats(ride.getAvailableSeats());
-       rideResponseDto.setTime(ride.getTime());
-       rideResponseDto.setPostedBy(userMapper.userToUserResponseDto(ride.getDriver()));
-       return rideResponseDto;
+    public RideResponseDto rideToRideResponseDto(Ride ride) {
+        RideResponseDto rideResponseDto = new RideResponseDto();
+        rideResponseDto.setId(ride.getId());
+        rideResponseDto.setDate(ride.getDate());
+        rideResponseDto.setOrigin(String.valueOf(ride.getOrigin()));
+        rideResponseDto.setDestination(String.valueOf(ride.getDestination()));
+        rideResponseDto.setAvailableSeats(ride.getAvailableSeats());
+        rideResponseDto.setTime(ride.getTime());
+        rideResponseDto.setDriverName(ride.getDriver().getName());
+        rideResponseDto.setDriverID(ride.getDriver().getId());
+        rideResponseDto.setPostedBy(userMapper.userToUserResponseDto(ride.getDriver()));
+        return rideResponseDto;
     }
 }
 

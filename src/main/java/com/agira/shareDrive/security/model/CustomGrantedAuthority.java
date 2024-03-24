@@ -12,7 +12,7 @@ import org.springframework.security.core.GrantedAuthority;
 public class CustomGrantedAuthority implements GrantedAuthority {
     private String role;
 
-    CustomGrantedAuthority(Role role){
+    CustomGrantedAuthority(Role role) {
         this.role = role.getName();
     }
 

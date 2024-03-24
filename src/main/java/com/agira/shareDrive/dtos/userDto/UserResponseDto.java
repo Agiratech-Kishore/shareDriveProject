@@ -13,4 +13,5 @@ public class UserResponseDto {
     private String email;
     private Integer age;
     private String mobileNumber;
+    private String token;
 }

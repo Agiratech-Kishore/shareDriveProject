@@ -17,22 +17,25 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/ride")
+@RequestMapping("${api.version}/ride")
 @AllArgsConstructor
 @CrossOrigin(origins = "http://localhost:4200")
 public class RideController {
     @Autowired
     private RideServiceImplementation rideServiceImplementation;
+
     @PostMapping
     public ResponseEntity<RideResponseDto> createRide(@Valid @RequestBody RideRequestDto rideRequestDto) throws UserNotFoundException, HttpRequestMethodNotSupportedException {
         RideResponseDto rideResponseDto = rideServiceImplementation.createRide(rideRequestDto);
         return ResponseEntity.ok(rideResponseDto);
     }
+
     @GetMapping
-    public ResponseEntity<List<RideResponseDto>> getAllRides() {
+    public ResponseEntity<List<RideResponseDto>> getAllRides(@RequestHeader("Authorization") String authorization) {
         List<RideResponseDto> rides = rideServiceImplementation.getAllRides();
         return ResponseEntity.ok(rides);
     }
+
     @GetMapping("/{id}")
     public ResponseEntity<RideResponseDto> getRideById(@PathVariable Integer id) throws RideNotFoundException {
         RideResponseDto rideResponseDto = rideServiceImplementation.getRideById(id);
@@ -52,23 +55,25 @@ public class RideController {
     }
 
     @GetMapping("/{origin}/{destination}")
-    public ResponseEntity<List<RideResponseDto>> getRidesByOriginAndDestination(@PathVariable String origin, @PathVariable String destination){
+    public ResponseEntity<List<RideResponseDto>> getRidesByOriginAndDestination(@PathVariable String origin, @PathVariable String destination) {
         List<RideResponseDto> rideByOriginAndDestination = rideServiceImplementation.getRideByOriginAndDestination(origin, destination);
         return ResponseEntity.ok(rideByOriginAndDestination);
     }
+
     @PostMapping("/request")
-    public ResponseEntity<RideRequestResponseDto> createRideRequest(@RequestParam int user,@RequestParam int ride) throws UserNotFoundException, RideNotFoundException {
+    public ResponseEntity<RideRequestResponseDto> createRideRequest(@RequestParam int user, @RequestParam int ride) throws UserNotFoundException, RideNotFoundException {
         RideRequestResponseDto rideRequestResponseDto = rideServiceImplementation.createRideRequest(user, ride);
         return ResponseEntity.ok(rideRequestResponseDto);
     }
+
     @GetMapping("/ride-requests/{userId}")
     public ResponseEntity<List<RideRequestResponseDto>> getAllRideRequests(@PathVariable("userId") int userId) throws UserNotFoundException {
-            List<RideRequestResponseDto> rideRequestResponseDtos = rideServiceImplementation.getAllRideRequest(userId);
-            return new ResponseEntity<>(rideRequestResponseDtos, HttpStatus.OK);
+        List<RideRequestResponseDto> rideRequestResponseDtos = rideServiceImplementation.getAllRideRequest(userId);
+        return new ResponseEntity<>(rideRequestResponseDtos, HttpStatus.OK);
     }
 
     @PatchMapping("ride-request/{rideRequestId}")
-    public ResponseEntity<RideRequestResponseDto> acceptOrRejectRideRequest(@PathVariable int rideRequestId, @RequestParam String approval) throws RuntimeException{
+    public ResponseEntity<RideRequestResponseDto> acceptOrRejectRideRequest(@PathVariable int rideRequestId, @RequestParam String approval) throws RuntimeException {
         RideRequestResponseDto rideRequestResponseDto = rideServiceImplementation.acceptOrDenyRideRequest(rideRequestId, approval);
         return new ResponseEntity<>(rideRequestResponseDto, HttpStatus.OK);
     }

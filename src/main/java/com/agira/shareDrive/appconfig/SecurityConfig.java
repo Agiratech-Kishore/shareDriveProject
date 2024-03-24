@@ -53,8 +53,12 @@ public class SecurityConfig {
         httpSecurity.authorizeHttpRequests(requests -> {
             try {
                 requests
-                        .anyRequest().permitAll()
+                        .requestMatchers("v1/users/login", "v1/users/register").permitAll()
                         .and()
+                        .authorizeHttpRequests().requestMatchers("v1/users/{id}", "v1/users").hasRole("ADMIN")
+                        .and()
+                        .authorizeHttpRequests().requestMatchers("v1/ride/**").authenticated()
+                        .and().authenticationProvider(authenticationProvider())
                         .cors().disable()
                         .csrf().disable();
 

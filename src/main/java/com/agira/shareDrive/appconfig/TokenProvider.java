@@ -1,18 +1,17 @@
 package com.agira.shareDrive.appconfig;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
 import java.util.Date;
+import java.util.function.Function;
 
 @Component
 public class TokenProvider {
@@ -31,7 +30,7 @@ public class TokenProvider {
                 .setSubject(userName)
                 .setIssuedAt(currentDate)
                 .setExpiration(expiryDate)
-                .signWith(key())
+                .signWith(key(), SignatureAlgorithm.HS256)
                 .compact();
     }
 
@@ -51,19 +50,40 @@ public class TokenProvider {
         return subject;
     }
 
-    public boolean validateToken(String token) {
-        try {
-            Jwts.parserBuilder()
-                    .setSigningKey(key())
-                    .build()
-                    .parse(token);
-            return true;
+//    public String extractUsername(String token){
+//        return extractClaim(token, Claims::getSubject);
+//    }
 
+    public Date extractExpiration(String token) {
+        return extractClaim(token, Claims::getExpiration);
+    }
 
-        } catch (ExpiredJwtException | IllegalArgumentException | SignatureException |
-                 MalformedJwtException exception) {
-            throw new RuntimeException(exception);
-        }
+    public Boolean validateToken(String token, UserDetails userDetails) {
+        final String username = extractUsername(token, jwtSecret);
+        return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+    }
+
+    public String extractUsername(String token, String secretKey) {
+        Claims claims = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody();
+        return claims.getSubject(); // Assuming the username is stored as the subject
+    }
+
+    public Boolean isTokenExpired(String token) {
+        return extractExpiration(token).before(new Date());
+    }
+
+    public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
+        final Claims claims = extractAllClaims(token);
+        return claimsResolver.apply(claims);
+    }
+
+    public Claims extractAllClaims(String token){
+        return Jwts
+                .parserBuilder()
+                .setSigningKey(key())
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
     }
 
 }

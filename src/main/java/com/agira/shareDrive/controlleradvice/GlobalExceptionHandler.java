@@ -13,26 +13,28 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(RideRequestNotFoundException.class)
-    public ResponseEntity<String> rideRequestNotFoundException(RideRequestNotFoundException rideRequestNotFoundException){
+    public ResponseEntity<String> rideRequestNotFoundException(RideRequestNotFoundException rideRequestNotFoundException) {
         return new ResponseEntity<>(rideRequestNotFoundException.getMessage(), HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(UserNotFoundException.class)
-    public ResponseEntity<String> userNotFoundException(UserNotFoundException userNotFoundException){
+    public ResponseEntity<String> userNotFoundException(UserNotFoundException userNotFoundException) {
         return new ResponseEntity<>(userNotFoundException.getMessage(), HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(RideNotFoundException.class)
-    public ResponseEntity<String> rideNotFoundException(RideNotFoundException rideNotFoundException){
-        return new ResponseEntity<>(rideNotFoundException.getMessage(),HttpStatus.NOT_FOUND);
+    public ResponseEntity<String> rideNotFoundException(RideNotFoundException rideNotFoundException) {
+        return new ResponseEntity<>(rideNotFoundException.getMessage(), HttpStatus.NOT_FOUND);
     }
+
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
     public ResponseEntity<Object> handleMethodNotAllowed(HttpRequestMethodNotSupportedException ex) {
         String message = "Method '" + ex.getMethod() + "' is not supported for this endpoint.";
         return new ResponseEntity<>(message, HttpStatus.METHOD_NOT_ALLOWED);
     }
+
     @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<Object> runTimeException(RuntimeException runtimeException){
-        return new ResponseEntity<>(runtimeException.getMessage(),HttpStatus.METHOD_NOT_ALLOWED);
+    public ResponseEntity<Object> runTimeException(RuntimeException runtimeException) {
+        return new ResponseEntity<>(runtimeException.getMessage(), HttpStatus.METHOD_NOT_ALLOWED);
     }
 }

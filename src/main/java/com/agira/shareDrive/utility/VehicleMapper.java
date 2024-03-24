@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 @Component
 public class VehicleMapper {
-    public Vehicle vehicleRequestDtoToVehicle(@RequestBody VehicleRequestDto vehicleRequestDto){
+    public Vehicle vehicleRequestDtoToVehicle(@RequestBody VehicleRequestDto vehicleRequestDto) {
         Vehicle vehicle = new Vehicle();
         vehicle.setMake(vehicleRequestDto.getMake());
         vehicle.setModel(vehicleRequestDto.getModel());
@@ -16,7 +16,8 @@ public class VehicleMapper {
         vehicle.setLicensePlate(vehicleRequestDto.getLicensePlate());
         return vehicle;
     }
-    public VehicleResponseDto vehicleToVehicleResponseDto(Vehicle vehicle){
+
+    public VehicleResponseDto vehicleToVehicleResponseDto(Vehicle vehicle) {
         VehicleResponseDto vehicleResponseDto = new VehicleResponseDto();
         vehicleResponseDto.setId(vehicle.getId());
         vehicleResponseDto.setMake(vehicle.getMake());

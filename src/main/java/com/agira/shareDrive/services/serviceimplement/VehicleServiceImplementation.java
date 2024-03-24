@@ -33,6 +33,7 @@ public class VehicleServiceImplementation implements VehicleService {
         Vehicle savedVehicle = vehicleRepository.save(vehicle);
         return vehicleMapper.vehicleToVehicleResponseDto(savedVehicle);
     }
+
     public VehicleResponseDto getVehicleById(Integer id) {
         Optional<Vehicle> vehicleOptional = vehicleRepository.findById(id);
         if (vehicleOptional.isPresent()) {
@@ -68,4 +69,5 @@ public class VehicleServiceImplementation implements VehicleService {
             throw new RuntimeException("Vehicle not found with id: " + id);
         }
     }
+
 }

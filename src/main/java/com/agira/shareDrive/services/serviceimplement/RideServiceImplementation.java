@@ -13,10 +13,18 @@ import com.agira.shareDrive.model.RideRequest;
 import com.agira.shareDrive.model.User;
 import com.agira.shareDrive.repositories.RideRepository;
 import com.agira.shareDrive.repositories.RideRequestRepository;
+import com.agira.shareDrive.repositories.VehicleRepository;
 import com.agira.shareDrive.services.service.RideService;
 import com.agira.shareDrive.utility.RideMapper;
 import com.agira.shareDrive.utility.UserMapper;
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
+import jakarta.persistence.criteria.Predicate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 
@@ -35,16 +43,23 @@ public class RideServiceImplementation implements RideService {
     @Autowired
     private RideRepository rideRepository;
     @Autowired
+    private JavaMailSender javaMailSender;
+    @Autowired
     private RideRequestRepository rideRequestRepository;
     @Autowired
     private UserMapper userMapper;
+    @Autowired
+    private VehicleRepository vehicleRepository;
 
     public RideResponseDto createRide(RideRequestDto rideRequestDto) throws UserNotFoundException, HttpRequestMethodNotSupportedException {
         User user = userService.getUserById(rideRequestDto.getUserId());
+        if (!vehicleRepository.existsById(rideRequestDto.getVehicleId())) {
+            throw new RuntimeException("No vehicle found. Kindly add a vehicle first");
+        }
         Ride ride = rideMapper.rideRequestDtoToRide(rideRequestDto);
         ride.setDriver(user);
         Ride createdRide = rideRepository.save(ride);
-        return rideMapper.rideToRideResponseDto(ride);
+        return rideMapper.rideToRideResponseDto(createdRide);
     }
 
     public List<RideResponseDto> getAllRides() {
@@ -109,6 +124,8 @@ public class RideServiceImplementation implements RideService {
         RideRequest savedRideRequest = rideRequestRepository.save(rideRequest);
         ride.getRideRequests().add(savedRideRequest);
         rideRepository.save(ride);
+        notifyRideOwner(ride.getDriver().getEmail(), user.getName(), ride.getId());
+
         RideResponseDto rideResponseDto = rideMapper.rideToRideResponseDto(savedRideRequest.getRide());
         UserResponseDto userResponseDto = userMapper.userToUserResponseDto(savedRideRequest.getRequester());
         RideRequestResponseDto rideRequestResponseDto = new RideRequestResponseDto();
@@ -119,9 +136,25 @@ public class RideServiceImplementation implements RideService {
         return rideRequestResponseDto;
     }
 
+    private void notifyRideOwner(String driverEmail, String requesterName, int rideId) {
+        String mailTemplate = String.format("Dear Ride Owner,\n\n A new ride request has been made by %s for your ride with ID: %s .", requesterName, rideId +
+                "\n\nRegards,\nShare Drive");
+        SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
+        simpleMailMessage.setTo(driverEmail);
+        simpleMailMessage.setSubject("New Ride Request Notification");
+        simpleMailMessage.setText(mailTemplate);
+        javaMailSender.send(simpleMailMessage);
+    }
+
     public List<RideRequestResponseDto> getAllRideRequest(int userId) throws UserNotFoundException {
         User user = userService.getUserById(userId);
-        List<RideRequest> rideRequests = user.getRideRequests();
+        Specification<RideRequest> specification = (root, query, criteriaBuilder) -> {
+            Predicate predicate = criteriaBuilder.conjunction();
+            predicate = criteriaBuilder.and(predicate, criteriaBuilder.equal(root.get("ride").get("driver").get("id"), userId));
+            return predicate;
+        };
+        List<RideRequest> rideRequests = rideRequestRepository.findAll(specification);
+//        List<RideRequest> rideRequests = user.getRideRequests();
         return rideRequests.stream().map(rideRequest -> {
                     RideResponseDto rideResponseDto = rideMapper.rideToRideResponseDto(rideRequest.getRide());
                     UserResponseDto userResponseDto = userMapper.userToUserResponseDto(rideRequest.getRequester());
@@ -134,25 +167,25 @@ public class RideServiceImplementation implements RideService {
                 .collect(Collectors.toList());
     }
 
-    public RideRequestResponseDto acceptOrDenyRideRequest(Integer id, String approval) throws RideRequestNotFoundException {
-        Optional<RideRequest> rideRequestOptional = rideRequestRepository.findById(id);
-        if (rideRequestOptional.isEmpty()) {
-            throw new RideRequestNotFoundException("No Ride found with id: " + id);
+    public RideRequestResponseDto acceptOrDenyRideRequest(Integer rideRequestId, String approval) throws RideRequestNotFoundException {
+        RideRequest rideRequest = rideRequestRepository.findByIdAndStatusNotLike(rideRequestId, "Reject").orElseThrow(() -> new RideRequestNotFoundException("No Ride found with id: " + rideRequestId));
+        if (rideRequest.getStatus().equalsIgnoreCase("accept") && approval.equalsIgnoreCase("accept")) {
+            throw new RuntimeException("This ride request has already been accepted");
         }
-        RideRequest rideRequest = rideRequestOptional.get();
-        if (approval.equalsIgnoreCase("Accept")) {
-            rideRequest.setStatus(Approval.ACCEPT);
-            Ride ride = rideRequest.getRide();
-            if (ride.getAvailableSeats() > 0) {
-                ride.setAvailableSeats(ride.getAvailableSeats() - 1);
-                rideRepository.save(ride);
-            } else {
+        if (rideRequest.getStatus().equalsIgnoreCase("Pending") && approval.equalsIgnoreCase("Accept")) {
+            if (rideRequest.getRide().getAvailableSeats() <= 0) {
                 throw new RuntimeException("Seats Are filled");
             }
-        } else {
+            rideRequest.setStatus(Approval.ACCEPT);
+            Ride ride = rideRequest.getRide();
+            ride.setAvailableSeats(ride.getAvailableSeats() - 1);
+            rideRepository.save(ride);
+        } else if (rideRequest.getStatus().equalsIgnoreCase("pending") && approval.equalsIgnoreCase("reject")) {
             rideRequest.setStatus(Approval.REJECT);
         }
         RideRequest modifiedRideRequest = rideRequestRepository.save(rideRequest);
+        SimpleMailMessage mailMessage = getSimpleMailMessage(approval, modifiedRideRequest);
+        javaMailSender.send(mailMessage);
         RideResponseDto rideResponseDto = rideMapper.rideToRideResponseDto(modifiedRideRequest.getRide());
         UserResponseDto userResponseDto = userMapper.userToUserResponseDto(modifiedRideRequest.getRequester());
         return RideRequestResponseDto.builder()
@@ -161,5 +194,33 @@ public class RideServiceImplementation implements RideService {
                 .userDetails(userResponseDto)
                 .rideDetails(rideResponseDto)
                 .build();
+    }
+
+    private static SimpleMailMessage getSimpleMailMessage(String approval, RideRequest modifiedRideRequest) {
+        String emailSubject;
+        String emailContent;
+        if (approval.equalsIgnoreCase("accept")) {
+            emailSubject = "Ride Request Accepted";
+            emailContent = String.format("Dear %s,\n\nYour ride request for Ride ID: %d has been accepted." +
+                            "\nRide Details:\nOrigin:%s\nDestination:%s\nDate:%s\nTime:%s\nDriver:%s\nRegards,\nShare Drive",
+                    modifiedRideRequest.getRequester().getName(),
+                    modifiedRideRequest.getRide().getId(),
+                    modifiedRideRequest.getRide().getOrigin(),
+                    modifiedRideRequest.getRide().getDestination(),
+                    modifiedRideRequest.getRide().getDate(),
+                    modifiedRideRequest.getRide().getTime(),
+                    modifiedRideRequest.getRide().getDriver().getName());
+        } else if (approval.equalsIgnoreCase("reject")) {
+            emailSubject = "Ride Request Rejected";
+            emailContent = String.format("Dear %s,\n\nYour ride request for Ride ID: %d has been rejected.\n\nRegards,\nShare Drive",
+                    modifiedRideRequest.getRequester().getName(), modifiedRideRequest.getRide().getId());
+        } else {
+            throw new RuntimeException("Error occurred");
+        }
+        SimpleMailMessage mailMessage = new SimpleMailMessage();
+        mailMessage.setTo(modifiedRideRequest.getRequester().getEmail());
+        mailMessage.setSubject(emailSubject);
+        mailMessage.setText(emailContent);
+        return mailMessage;
     }
 }

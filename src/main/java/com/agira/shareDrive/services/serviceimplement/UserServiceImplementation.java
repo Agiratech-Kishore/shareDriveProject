@@ -23,6 +23,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -43,6 +44,7 @@ public class UserServiceImplementation implements UserService {
     private TokenProvider tokenProvider;
     @Autowired
     private JavaMailSender javaMailSender;
+
     public UserResponseDto createUser(UserRequestDto userRequestDto) {
         User user = userMapper.userRequestDtoToUser(userRequestDto);
         String encodedPassword = passwordEncoder.encode(userRequestDto.getPassword());
@@ -118,8 +120,17 @@ public class UserServiceImplementation implements UserService {
 
 //        return new LoginResponseDto("Login Success",tokenProvider.generateToken(authentication));
         String token = tokenProvider.generateToken(authentication);
-        String message = "Login Successfull";
+        String message = "Login Successful";
         return new LoginResponseDto(token, message);
     }
 
+    public UserResponseDto getUserByEmail(String email) {
+        User user = userRepository.findByEmail(email).get();
+
+        if (user != null) {
+            return userMapper.userToUserResponseDto(user);
+        } else {
+            return null;
+        }
+    }
 }

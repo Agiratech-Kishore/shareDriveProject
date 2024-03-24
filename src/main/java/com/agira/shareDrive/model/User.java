@@ -1,5 +1,6 @@
 package com.agira.shareDrive.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -17,7 +18,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-public class User{
+public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
@@ -28,11 +29,12 @@ public class User{
     @Column(unique = true)
     private String mobileNumber;
     private String password;
-    @OneToMany(mappedBy = "driver",fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "driver", fetch = FetchType.EAGER)
     private List<Ride> ridesAsDriver;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "user",fetch = FetchType.EAGER)
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "user", fetch = FetchType.EAGER)
     private List<Vehicle> vehicles;
-    @OneToMany(mappedBy = "requester",fetch = FetchType.LAZY,cascade = {CascadeType.REMOVE,CascadeType.MERGE})
+    @OneToMany(mappedBy = "requester", fetch = FetchType.LAZY, cascade = {CascadeType.REMOVE, CascadeType.MERGE})
+    @JsonManagedReference
     private List<RideRequest> rideRequests;
     @ManyToMany
     private List<Ride> rides;

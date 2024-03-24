@@ -19,4 +19,6 @@ public interface UserService {
     UserResponseDto updateUser(int id, UserRequestDto userRequestDto) throws UserNotFoundException;
 
     void deleteUser(int id) throws UserNotFoundException;
+
+
 }

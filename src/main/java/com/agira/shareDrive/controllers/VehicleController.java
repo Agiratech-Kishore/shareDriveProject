@@ -10,7 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/vehicles")
+@RequestMapping("${api.version}/vehicles")
 @CrossOrigin(origins = "http://localhost:4200")
 
 public class VehicleController {
@@ -23,6 +23,7 @@ public class VehicleController {
         VehicleResponseDto vehicleResponseDto = vehicleServiceImplementation.createVehicle(vehicleRequestDto);
         return ResponseEntity.ok(vehicleResponseDto);
     }
+
     @GetMapping("/{id}")
     public ResponseEntity<VehicleResponseDto> getVehicleById(@PathVariable Integer id) {
         VehicleResponseDto vehicleResponseDto = vehicleServiceImplementation.getVehicleById(id);

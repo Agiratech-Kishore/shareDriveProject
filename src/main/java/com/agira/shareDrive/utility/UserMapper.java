@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 @Component
 public class UserMapper {
-    public User userRequestDtoToUser(@RequestBody UserRequestDto userRequestDto){
+    public User userRequestDtoToUser(@RequestBody UserRequestDto userRequestDto) {
         User user = new User();
         user.setName(userRequestDto.getName());
         user.setEmail(userRequestDto.getEmail());
@@ -17,7 +17,7 @@ public class UserMapper {
         return user;
     }
 
-    public UserResponseDto userToUserResponseDto(User user){
+    public UserResponseDto userToUserResponseDto(User user) {
         UserResponseDto userResponseDto = new UserResponseDto();
         userResponseDto.setId(user.getId());
         userResponseDto.setName(user.getName());

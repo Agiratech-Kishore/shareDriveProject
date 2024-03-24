@@ -1,6 +1,8 @@
 package com.agira.shareDrive.dtos.rideDto;
 
 import com.agira.shareDrive.dtos.userDto.UserResponseDto;
+import com.agira.shareDrive.model.RideRequest;
+import com.agira.shareDrive.model.User;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -10,6 +12,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Date;
 import java.sql.Time;
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -21,5 +24,7 @@ public class RideResponseDto {
     private int availableSeats;
     private LocalDate date;
     private LocalTime time;
+    private String driverName;
+    private int driverID;
     private UserResponseDto postedBy;
 }
