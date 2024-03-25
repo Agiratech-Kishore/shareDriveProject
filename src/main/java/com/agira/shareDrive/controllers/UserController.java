@@ -58,7 +58,7 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<UserResponseDto> loginUser(@RequestBody LoginRequestDto loginRequestDto) {
+    public ResponseEntity<UserResponseDto> loginUser(@RequestBody LoginRequestDto loginRequestDto) throws UserNotFoundException {
         LoginResponseDto loginResponseDto = userService.loginUser(loginRequestDto);
         String email = loginRequestDto.getEmail();
         UserResponseDto userByEmail = userService.getUserByEmail(email);

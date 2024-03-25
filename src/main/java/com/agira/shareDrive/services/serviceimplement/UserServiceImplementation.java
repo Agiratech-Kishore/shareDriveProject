@@ -46,7 +46,7 @@ public class UserServiceImplementation implements UserService {
     private JavaMailSender javaMailSender;
 
     public UserResponseDto createUser(UserRequestDto userRequestDto) {
-        User user = userMapper.userRequestDtoToUser(userRequestDto);
+        User user = UserMapper.userRequestDtoToUser(userRequestDto);
         String encodedPassword = passwordEncoder.encode(userRequestDto.getPassword());
         user.setPassword(encodedPassword);
         User savedUser = userRepository.save(user);
@@ -56,7 +56,7 @@ public class UserServiceImplementation implements UserService {
         String mailTemplate = String.format("Dear %s,\n\nWelcome to Agira ShareDrive!\n\n", user.getName());
         simpleMailMessage.setText(mailTemplate);
         javaMailSender.send(simpleMailMessage);
-        return userMapper.userToUserResponseDto(savedUser);
+        return UserMapper.userToUserResponseDto(savedUser);
     }
 
     @Override
@@ -65,12 +65,12 @@ public class UserServiceImplementation implements UserService {
         if (users.isEmpty()) {
             throw new UserNotFoundException("No users found");
         }
-        return users.stream().map(userMapper::userToUserResponseDto).collect(Collectors.toList());
+        return users.stream().map(UserMapper::userToUserResponseDto).collect(Collectors.toList());
     }
 
     public UserResponseDto findUserById(int id) throws UserNotFoundException {
         User user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("User not found with id: " + id));
-        return userMapper.userToUserResponseDto(user);
+        return UserMapper.userToUserResponseDto(user);
     }
 
     public User getUserById(int id) throws UserNotFoundException {
@@ -79,10 +79,10 @@ public class UserServiceImplementation implements UserService {
 
     public UserResponseDto updateUser(int id, UserRequestDto userRequestDto) throws UserNotFoundException {
         User existingUser = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("User not found with id: " + id));
-        User updatedUser = userMapper.userRequestDtoToUser(userRequestDto);
+        User updatedUser = UserMapper.userRequestDtoToUser(userRequestDto);
         updatedUser.setId(id);
         User savedUser = userRepository.save(updatedUser);
-        return userMapper.userToUserResponseDto(savedUser);
+        return UserMapper.userToUserResponseDto(savedUser);
     }
 
     @Override
@@ -124,13 +124,12 @@ public class UserServiceImplementation implements UserService {
         return new LoginResponseDto(token, message);
     }
 
-    public UserResponseDto getUserByEmail(String email) {
-        User user = userRepository.findByEmail(email).get();
-
-        if (user != null) {
-            return userMapper.userToUserResponseDto(user);
-        } else {
-            return null;
+    public UserResponseDto getUserByEmail(String email) throws UserNotFoundException {
+        Optional<User> user = userRepository.findByEmail(email);
+        if(user.isEmpty()){
+            throw new UserNotFoundException("User not found with email: " + email);
         }
+        return UserMapper.userToUserResponseDto(user.get());
+
     }
 }
