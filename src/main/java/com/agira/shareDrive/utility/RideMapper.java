@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 @Component
 public class RideMapper {
     @Autowired
-    private UserMapper userMapper;
+    private static UserMapper userMapper;
 
     public Ride rideRequestDtoToRide(@RequestBody RideRequestDto rideRequestDto) {
         Ride ride = new Ride();
@@ -22,7 +22,7 @@ public class RideMapper {
         return ride;
     }
 
-    public RideResponseDto rideToRideResponseDto(Ride ride) {
+    public static RideResponseDto rideToRideResponseDto(Ride ride) {
         RideResponseDto rideResponseDto = new RideResponseDto();
         rideResponseDto.setId(ride.getId());
         rideResponseDto.setDate(ride.getDate());
