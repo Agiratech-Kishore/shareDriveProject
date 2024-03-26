@@ -35,8 +35,6 @@ public class UserServiceImplementation implements UserService {
     private UserRepository userRepository;
 
     @Autowired
-    private UserMapper userMapper;
-    @Autowired
     private PasswordEncoder passwordEncoder;
     @Autowired
     AuthenticationManager authenticationManager;

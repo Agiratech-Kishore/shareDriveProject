@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -31,7 +32,14 @@ public class UserMapper {
         userResponseDto.setAge(user.getAge());
         userResponseDto.setEmail(user.getEmail());
         userResponseDto.setMobileNumber(user.getMobileNumber());
-        List<RideResponseDto> rideResponseDtoList = user.getRides().stream().map(ride -> RideMapper.rideToRideResponseDto(ride)).collect(Collectors.toList());
+        List<RideResponseDto> rideResponseDtoList;
+        if (user.getRides() != null) {
+            rideResponseDtoList = user.getRides().stream()
+                    .map(RideMapper::rideToRideResponseDto)
+                    .collect(Collectors.toList());
+        } else {
+            rideResponseDtoList = new ArrayList<>();
+        }
         userResponseDto.setRideList(rideResponseDtoList);
         return userResponseDto;
     }

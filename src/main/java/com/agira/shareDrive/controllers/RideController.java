@@ -31,7 +31,7 @@ public class RideController {
     }
 
     @GetMapping
-    public ResponseEntity<List<RideResponseDto>> getAllRides(@RequestHeader("Authorization") String authorization) {
+    public ResponseEntity<List<RideResponseDto>> getAllRides(String authorization) {
         List<RideResponseDto> rides = rideServiceImplementation.getAllRides();
         return ResponseEntity.ok(rides);
     }

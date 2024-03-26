@@ -9,10 +9,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 @Component
 public class RideMapper {
-    @Autowired
-    private static UserMapper userMapper;
 
-    public Ride rideRequestDtoToRide(@RequestBody RideRequestDto rideRequestDto) {
+    public static Ride rideRequestDtoToRide(@RequestBody RideRequestDto rideRequestDto) {
         Ride ride = new Ride();
         ride.setDate(rideRequestDto.getDate());
         ride.setTime(rideRequestDto.getTime());
@@ -32,7 +30,7 @@ public class RideMapper {
         rideResponseDto.setTime(ride.getTime());
         rideResponseDto.setDriverName(ride.getDriver().getName());
         rideResponseDto.setDriverID(ride.getDriver().getId());
-        rideResponseDto.setPostedBy(userMapper.userToUserResponseDto(ride.getDriver()));
+        rideResponseDto.setPostedBy(UserMapper.userToUserResponseDto(ride.getDriver()));
         return rideResponseDto;
     }
 }

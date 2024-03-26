@@ -37,8 +37,6 @@ import static org.springframework.data.jpa.domain.AbstractPersistable_.id;
 @Service
 public class RideServiceImplementation implements RideService {
     @Autowired
-    private RideMapper rideMapper;
-    @Autowired
     private UserServiceImplementation userService;
     @Autowired
     private RideRepository rideRepository;
@@ -56,22 +54,22 @@ public class RideServiceImplementation implements RideService {
         if (!vehicleRepository.existsById(rideRequestDto.getVehicleId())) {
             throw new RuntimeException("No vehicle found. Kindly add a vehicle first");
         }
-        Ride ride = rideMapper.rideRequestDtoToRide(rideRequestDto);
+        Ride ride = RideMapper.rideRequestDtoToRide(rideRequestDto);
         ride.setDriver(user);
         Ride createdRide = rideRepository.save(ride);
-        return rideMapper.rideToRideResponseDto(createdRide);
+        return RideMapper.rideToRideResponseDto(createdRide);
     }
 
     public List<RideResponseDto> getAllRides() {
         List<Ride> rides = rideRepository.findAll();
-        return rides.stream().map(ride -> rideMapper.rideToRideResponseDto(ride)).collect(Collectors.toList());
+        return rides.stream().map(RideMapper::rideToRideResponseDto).collect(Collectors.toList());
     }
 
     public RideResponseDto getRideById(Integer id) throws RideNotFoundException {
         Optional<Ride> rideOptional = rideRepository.findById(id);
         if (rideOptional.isPresent()) {
             Ride ride = rideOptional.get();
-            return rideMapper.rideToRideResponseDto(ride);
+            return RideMapper.rideToRideResponseDto(ride);
         } else {
             throw new RideNotFoundException("Ride not found with id: " + id);
         }
@@ -83,12 +81,12 @@ public class RideServiceImplementation implements RideService {
             Ride existingRide = existingRideOptional.get();
 
             User user = userService.getUserById(rideRequestDto.getUserId());
-            Ride updatedRide = rideMapper.rideRequestDtoToRide(rideRequestDto);
+            Ride updatedRide = RideMapper.rideRequestDtoToRide(rideRequestDto);
             updatedRide.setDriver(user);
             updatedRide.setId(existingRide.getId());
 
             Ride savedRide = rideRepository.save(updatedRide);
-            return rideMapper.rideToRideResponseDto(savedRide);
+            return RideMapper.rideToRideResponseDto(savedRide);
         } else {
             throw new RideNotFoundException("Ride not found with id: " + id);
         }
@@ -107,7 +105,7 @@ public class RideServiceImplementation implements RideService {
         return rideRepository.findByOriginEqualsAndDestinationEquals(origin, destination).stream().map(ride -> {
             Ride ride1 = ride.get();
             RideResponseDto rideResponseDto = new RideResponseDto();
-            return rideMapper.rideToRideResponseDto(ride1);
+            return RideMapper.rideToRideResponseDto(ride1);
         }).collect(Collectors.toList());
     }
 
@@ -126,8 +124,8 @@ public class RideServiceImplementation implements RideService {
         rideRepository.save(ride);
         notifyRideOwner(ride.getDriver().getEmail(), user.getName(), ride.getId());
 
-        RideResponseDto rideResponseDto = rideMapper.rideToRideResponseDto(savedRideRequest.getRide());
-        UserResponseDto userResponseDto = userMapper.userToUserResponseDto(savedRideRequest.getRequester());
+        RideResponseDto rideResponseDto = RideMapper.rideToRideResponseDto(savedRideRequest.getRide());
+        UserResponseDto userResponseDto = UserMapper.userToUserResponseDto(savedRideRequest.getRequester());
         RideRequestResponseDto rideRequestResponseDto = new RideRequestResponseDto();
         rideRequestResponseDto.setRideDetails(rideResponseDto);
         rideRequestResponseDto.setUserDetails(userResponseDto);
@@ -156,8 +154,8 @@ public class RideServiceImplementation implements RideService {
         List<RideRequest> rideRequests = rideRequestRepository.findAll(specification);
 //        List<RideRequest> rideRequests = user.getRideRequests();
         return rideRequests.stream().map(rideRequest -> {
-                    RideResponseDto rideResponseDto = rideMapper.rideToRideResponseDto(rideRequest.getRide());
-                    UserResponseDto userResponseDto = userMapper.userToUserResponseDto(rideRequest.getRequester());
+                    RideResponseDto rideResponseDto = RideMapper.rideToRideResponseDto(rideRequest.getRide());
+                    UserResponseDto userResponseDto = UserMapper.userToUserResponseDto(rideRequest.getRequester());
                     return RideRequestResponseDto.builder().
                             rideDetails(rideResponseDto).
                             userDetails(userResponseDto).
@@ -186,8 +184,8 @@ public class RideServiceImplementation implements RideService {
         RideRequest modifiedRideRequest = rideRequestRepository.save(rideRequest);
         SimpleMailMessage mailMessage = getSimpleMailMessage(approval, modifiedRideRequest);
         javaMailSender.send(mailMessage);
-        RideResponseDto rideResponseDto = rideMapper.rideToRideResponseDto(modifiedRideRequest.getRide());
-        UserResponseDto userResponseDto = userMapper.userToUserResponseDto(modifiedRideRequest.getRequester());
+        RideResponseDto rideResponseDto = RideMapper.rideToRideResponseDto(modifiedRideRequest.getRide());
+        UserResponseDto userResponseDto = UserMapper.userToUserResponseDto(modifiedRideRequest.getRequester());
         return RideRequestResponseDto.builder()
                 .id(modifiedRideRequest.getId())
                 .status(modifiedRideRequest.getStatus())

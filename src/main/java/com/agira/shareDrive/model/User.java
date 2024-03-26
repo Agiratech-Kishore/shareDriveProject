@@ -41,5 +41,4 @@ public class User {
     private boolean deleted;
     @ManyToMany(cascade = {CascadeType.PERSIST})
     private List<Role> roleList;
-
 }
