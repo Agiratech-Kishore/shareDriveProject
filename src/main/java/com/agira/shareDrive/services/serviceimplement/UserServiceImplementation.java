@@ -33,7 +33,6 @@ public class UserServiceImplementation implements UserService {
 
     @Autowired
     private UserRepository userRepository;
-
     @Autowired
     private PasswordEncoder passwordEncoder;
     @Autowired
@@ -43,7 +42,7 @@ public class UserServiceImplementation implements UserService {
     @Autowired
     private JavaMailSender javaMailSender;
 
-    public UserResponseDto createUser(UserRequestDto userRequestDto) {
+    public UserResponseDto createUser(UserRequestDto userRequestDto) throws Exception {
         User user = UserMapper.userRequestDtoToUser(userRequestDto);
         String encodedPassword = passwordEncoder.encode(userRequestDto.getPassword());
         user.setPassword(encodedPassword);
@@ -77,9 +76,23 @@ public class UserServiceImplementation implements UserService {
 
     public UserResponseDto updateUser(int id, UserRequestDto userRequestDto) throws UserNotFoundException {
         User existingUser = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("User not found with id: " + id));
-        User updatedUser = UserMapper.userRequestDtoToUser(userRequestDto);
-        updatedUser.setId(id);
-        User savedUser = userRepository.save(updatedUser);
+        if(userRequestDto.getEmail() != null){
+            existingUser.setEmail(userRequestDto.getEmail());
+        }
+        if(userRequestDto.getPassword() != null){
+            String hashedPassword = passwordEncoder.encode(userRequestDto.getPassword());
+            existingUser.setPassword(hashedPassword);
+        }
+        if(userRequestDto.getName() != null){
+            existingUser.setName(userRequestDto.getName());
+        }
+        if(userRequestDto.getMobileNumber() !=null){
+            existingUser.setMobileNumber(userRequestDto.getMobileNumber());
+        }
+        if(userRequestDto.getAge() !=null){
+            existingUser.setAge(userRequestDto.getAge());
+        }
+        User savedUser = userRepository.save(existingUser);
         return UserMapper.userToUserResponseDto(savedUser);
     }
 
@@ -90,36 +103,17 @@ public class UserServiceImplementation implements UserService {
         userRepository.delete(existingUser);
     }
 
-//    public LoginResponseDto loginUser(LoginRequestDto loginRequestDto) {
-//        String msg = "";
-//        User user1 = userRepository.findByEmail(loginRequestDto.getEmail());
-//        if(user1!=null){
-//            String plainPassword = loginRequestDto.getPassword();
-//            String encodedPassword = user1.getPassword();
-//            Boolean isPwdRight = passwordEncoder.matches(plainPassword,encodedPassword);
-//            if(isPwdRight){
-//               Optional<User> user = userRepository.findOneByEmailAndPassword(loginRequestDto.getEmail(),loginRequestDto.getPassword());
-//               if(user.isPresent()){
-//                   return new LoginResponseDto("Login Success",true);
-//               } else {
-//                   return new LoginResponseDto("Login Failed",false);
-//               }
-//            } else {
-//                return new LoginResponseDto("Password Not Match",false);
-//            }
-//        } else {
-//            return new LoginResponseDto("Email not exists",false);
-//        }
-//    }
-
-    public LoginResponseDto loginUser(LoginRequestDto loginRequestDto) {
+    public LoginResponseDto loginUser(LoginRequestDto loginRequestDto) throws UserNotFoundException {
         Authentication authentication = null;
         authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequestDto.getEmail(), loginRequestDto.getPassword()));
-
-//        return new LoginResponseDto("Login Success",tokenProvider.generateToken(authentication));
         String token = tokenProvider.generateToken(authentication);
         String message = "Login Successful";
-        return new LoginResponseDto(token, message);
+        UserResponseDto userByEmail = getUserByEmail(loginRequestDto.getEmail());
+        LoginResponseDto loginResponseDto = new LoginResponseDto();
+        loginResponseDto.setMessage(message);
+        loginResponseDto.setToken(token);
+        loginResponseDto.setUserId(userByEmail.getId());
+        return loginResponseDto;
     }
 
     public UserResponseDto getUserByEmail(String email) throws UserNotFoundException {
@@ -128,6 +122,5 @@ public class UserServiceImplementation implements UserService {
             throw new UserNotFoundException("User not found with email: " + email);
         }
         return UserMapper.userToUserResponseDto(user.get());
-
     }
 }

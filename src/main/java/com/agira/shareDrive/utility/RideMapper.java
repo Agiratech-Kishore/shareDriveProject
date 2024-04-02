@@ -30,7 +30,7 @@ public class RideMapper {
         rideResponseDto.setTime(ride.getTime());
         rideResponseDto.setDriverName(ride.getDriver().getName());
         rideResponseDto.setDriverID(ride.getDriver().getId());
-        rideResponseDto.setPostedBy(UserMapper.userToUserResponseDto(ride.getDriver()));
+        rideResponseDto.setRideStatus(ride.getRideStatus());
         return rideResponseDto;
     }
 }

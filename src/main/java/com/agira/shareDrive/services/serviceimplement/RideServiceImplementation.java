@@ -7,7 +7,7 @@ import com.agira.shareDrive.dtos.userDto.UserResponseDto;
 import com.agira.shareDrive.exceptions.RideNotFoundException;
 import com.agira.shareDrive.exceptions.RideRequestNotFoundException;
 import com.agira.shareDrive.exceptions.UserNotFoundException;
-import com.agira.shareDrive.model.Approval;
+import com.agira.shareDrive.statusconstants.Approval;
 import com.agira.shareDrive.model.Ride;
 import com.agira.shareDrive.model.RideRequest;
 import com.agira.shareDrive.model.User;
@@ -128,7 +128,10 @@ public class RideServiceImplementation implements RideService {
         UserResponseDto userResponseDto = UserMapper.userToUserResponseDto(savedRideRequest.getRequester());
         RideRequestResponseDto rideRequestResponseDto = new RideRequestResponseDto();
         rideRequestResponseDto.setRideDetails(rideResponseDto);
-        rideRequestResponseDto.setUserDetails(userResponseDto);
+        rideRequestResponseDto.setUserName(userResponseDto.getName());
+        rideRequestResponseDto.setUserAge(userResponseDto.getAge());
+        rideRequestResponseDto.setUserEmail(userResponseDto.getEmail());
+        rideRequestResponseDto.setUserMobile(userResponseDto.getMobileNumber());
         rideRequestResponseDto.setId(savedRideRequest.getId());
         rideRequestResponseDto.setStatus(savedRideRequest.getStatus());
         return rideRequestResponseDto;
@@ -152,17 +155,36 @@ public class RideServiceImplementation implements RideService {
             return predicate;
         };
         List<RideRequest> rideRequests = rideRequestRepository.findAll(specification);
-//        List<RideRequest> rideRequests = user.getRideRequests();
         return rideRequests.stream().map(rideRequest -> {
                     RideResponseDto rideResponseDto = RideMapper.rideToRideResponseDto(rideRequest.getRide());
                     UserResponseDto userResponseDto = UserMapper.userToUserResponseDto(rideRequest.getRequester());
                     return RideRequestResponseDto.builder().
                             rideDetails(rideResponseDto).
-                            userDetails(userResponseDto).
+                            userName(userResponseDto.getName()).
+                            userAge(userResponseDto.getAge()).
+                            userEmail(userResponseDto.getEmail()).
+                            userMobile(userResponseDto.getMobileNumber()).
                             status(rideRequest.getStatus()).
                             id(rideRequest.getId()).build();
                 })
                 .collect(Collectors.toList());
+    }
+
+    public List<RideRequestResponseDto> getAllRideRequestByRideId(int rideId) throws RideNotFoundException {
+        Ride ride = rideRepository.findById(rideId).orElseThrow(() -> new RideNotFoundException("No ride found with this id"));
+        return ride.getRideRequests().stream().map(rideRequest -> {
+            RideResponseDto rideResponseDto = RideMapper.rideToRideResponseDto(rideRequest.getRide());
+            UserResponseDto userResponseDto = UserMapper.userToUserResponseDto(rideRequest.getRequester());
+            return RideRequestResponseDto.builder().
+                    rideDetails(rideResponseDto).
+                    userName(userResponseDto.getName()).
+                    userAge(userResponseDto.getAge()).
+                    userEmail(userResponseDto.getEmail()).
+                    userMobile(userResponseDto.getMobileNumber()).
+                    status(rideRequest.getStatus()).
+                    id(rideRequest.getId()).build();
+        }).collect(Collectors.toList());
+
     }
 
     public RideRequestResponseDto acceptOrDenyRideRequest(Integer rideRequestId, String approval) throws RideRequestNotFoundException {
@@ -189,9 +211,23 @@ public class RideServiceImplementation implements RideService {
         return RideRequestResponseDto.builder()
                 .id(modifiedRideRequest.getId())
                 .status(modifiedRideRequest.getStatus())
-                .userDetails(userResponseDto)
+                .userName(userResponseDto.getName()).
+                userAge(userResponseDto.getAge()).
+                userEmail(userResponseDto.getEmail()).
+                userMobile(userResponseDto.getMobileNumber())
                 .rideDetails(rideResponseDto)
                 .build();
+    }
+
+    @Override
+    public RideResponseDto completeOrCancelRide(Integer rideId, String status) throws RideNotFoundException {
+        Ride ride = rideRepository.findByIdAndRideStatusLike(rideId, RideStatus.CREATED).orElseThrow(() -> new RuntimeException("No Ride found with this id"));
+        if(!status.equalsIgnoreCase(RideStatus.COMPLETED) && !status.equalsIgnoreCase(RideStatus.CANCELLED)){
+            throw new RuntimeException("Please provide valid option, Completed or Cancelled");
+        }
+        ride.setRideStatus(status);
+        Ride updatedRide = rideRepository.save(ride);
+        return RideMapper.rideToRideResponseDto(updatedRide);
     }
 
     private static SimpleMailMessage getSimpleMailMessage(String approval, RideRequest modifiedRideRequest) {

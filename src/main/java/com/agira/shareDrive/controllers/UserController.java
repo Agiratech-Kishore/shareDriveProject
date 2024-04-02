@@ -28,7 +28,7 @@ public class UserController {
     private UserRepository userRepository;
 
     @PostMapping("/register")
-    public ResponseEntity<UserResponseDto> createUser(@Valid @RequestBody UserRequestDto userRequestDto) {
+    public ResponseEntity<UserResponseDto> createUser(@Valid @RequestBody UserRequestDto userRequestDto) throws Exception{
         UserResponseDto userResponseDto = userService.createUser(userRequestDto);
         return ResponseEntity.ok(userResponseDto);
     }
@@ -60,9 +60,6 @@ public class UserController {
     @PostMapping("/login")
     public ResponseEntity<UserResponseDto> loginUser(@RequestBody LoginRequestDto loginRequestDto) throws UserNotFoundException {
         LoginResponseDto loginResponseDto = userService.loginUser(loginRequestDto);
-        String email = loginRequestDto.getEmail();
-        UserResponseDto userByEmail = userService.getUserByEmail(email);
-        userByEmail.setToken(loginResponseDto.getToken());
-        return ResponseEntity.ok(userByEmail);
+        return ResponseEntity.ok(loginResponseDto);
     }
 }

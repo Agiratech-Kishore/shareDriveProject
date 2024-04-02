@@ -1,4 +1,4 @@
-package com.agira.shareDrive.model;
+package com.agira.shareDrive.statusconstants;
 
 
 public class Approval {

@@ -1,25 +1,14 @@
 package com.agira.shareDrive.dtos.loginLogout;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
 @Setter
-
+@AllArgsConstructor
+@NoArgsConstructor
 public class LoginResponseDto {
-    String message;
-    //    Boolean status;
+    private String message;
     private String token;
     private String type = "Bearer";
-
-//    public LoginResponseDto(String loginSuccess, String s) {
-//    }
-
-
-    public LoginResponseDto(String token, String message) {
-        this.token = token;
-        this.message = message;
-    }
+    private int userId;
 }

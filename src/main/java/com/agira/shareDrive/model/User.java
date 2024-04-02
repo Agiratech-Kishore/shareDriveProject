@@ -6,11 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.Collection;
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -35,9 +32,9 @@ public class User {
     private List<Vehicle> vehicles;
     @OneToMany(mappedBy = "requester", fetch = FetchType.LAZY, cascade = {CascadeType.REMOVE, CascadeType.MERGE})
     @JsonManagedReference
-    private List<RideRequest> rideRequests;
-    @ManyToMany
-    private List<Ride> rides;
+    private List<RideRequest> rideRequests = new ArrayList<>();
+    @ManyToMany(mappedBy = "users", fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
+    private List<Ride> rides = new ArrayList<>();
     private boolean deleted;
     @ManyToMany(cascade = {CascadeType.PERSIST})
     private List<Role> roleList;

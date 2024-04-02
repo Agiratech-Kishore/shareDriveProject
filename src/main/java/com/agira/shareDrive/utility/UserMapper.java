@@ -3,6 +3,7 @@ package com.agira.shareDrive.utility;
 import com.agira.shareDrive.dtos.rideDto.RideResponseDto;
 import com.agira.shareDrive.dtos.userDto.UserRequestDto;
 import com.agira.shareDrive.dtos.userDto.UserResponseDto;
+import com.agira.shareDrive.dtos.vehicleDto.VehicleResponseDto;
 import com.agira.shareDrive.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

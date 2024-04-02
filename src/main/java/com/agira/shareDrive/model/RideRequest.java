@@ -1,6 +1,8 @@
 package com.agira.shareDrive.model;
 
+import com.agira.shareDrive.statusconstants.Approval;
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -25,7 +27,7 @@ public class RideRequest {
 
     @ManyToOne
     @JoinColumn(name = "requester_id")
-    @JsonBackReference
+    @JsonIgnore
     private User requester;
 
     private String status = Approval.PENDING;

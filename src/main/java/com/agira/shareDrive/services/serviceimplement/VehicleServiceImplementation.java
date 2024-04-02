@@ -12,7 +12,9 @@ import org.springframework.stereotype.Service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class VehicleServiceImplementation implements VehicleService {
@@ -64,10 +66,19 @@ public class VehicleServiceImplementation implements VehicleService {
     public void deleteVehicle(Integer id) {
         Optional<Vehicle> existingVehicleOptional = vehicleRepository.findById(id);
         if (existingVehicleOptional.isPresent()) {
-            vehicleRepository.deleteById(id);
+            Vehicle vehicle = existingVehicleOptional.get();
+            vehicle.setDeleted(true);
+            vehicleRepository.save(vehicle);
         } else {
             throw new RuntimeException("Vehicle not found with id: " + id);
         }
+    }
+
+    @Override
+    public List<VehicleResponseDto> getVehicleByUser(Integer userId) {
+        List<Vehicle> vehicleList = vehicleRepository.findByUserIdAndDeletedEquals(userId, false).orElseThrow(() -> new RuntimeException("Vehicle not found with this id" + userId));
+        return vehicleList.stream()
+                .map(vehicle -> vehicleMapper.vehicleToVehicleResponseDto(vehicle)).toList();
     }
 
 }

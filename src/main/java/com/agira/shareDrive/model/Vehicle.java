@@ -22,10 +22,8 @@ public class Vehicle {
     private int capacity;
     @Column(unique = true)
     private String licensePlate;
-    @ManyToOne
+    @ManyToOne()
     @JoinColumn(name = "user_id")
     private User user;
     private boolean deleted;
-//    @OneToMany
-//    private List<String> imageUrl;
 }

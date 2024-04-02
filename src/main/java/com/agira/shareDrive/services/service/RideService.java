@@ -28,4 +28,6 @@ public interface RideService {
     List<RideRequestResponseDto> getAllRideRequest(int userId) throws UserNotFoundException;
 
     RideRequestResponseDto acceptOrDenyRideRequest(Integer id, String approval) throws RideRequestNotFoundException;
+
+    RideResponseDto completeOrCancelRide(Integer rideId,String status) throws RideNotFoundException;
 }

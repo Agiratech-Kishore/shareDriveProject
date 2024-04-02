@@ -4,6 +4,8 @@ import com.agira.shareDrive.dtos.vehicleDto.VehicleRequestDto;
 import com.agira.shareDrive.dtos.vehicleDto.VehicleResponseDto;
 import com.agira.shareDrive.exceptions.UserNotFoundException;
 
+import java.util.List;
+
 public interface VehicleService {
 
     VehicleResponseDto createVehicle(VehicleRequestDto vehicleRequestDto) throws UserNotFoundException;

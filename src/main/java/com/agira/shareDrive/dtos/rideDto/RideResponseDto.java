@@ -3,6 +3,7 @@ package com.agira.shareDrive.dtos.rideDto;
 import com.agira.shareDrive.dtos.userDto.UserResponseDto;
 import com.agira.shareDrive.model.RideRequest;
 import com.agira.shareDrive.model.User;
+import com.agira.shareDrive.statusconstants.RideStatus;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -26,5 +27,5 @@ public class RideResponseDto {
     private LocalTime time;
     private String driverName;
     private int driverID;
-    private UserResponseDto postedBy;
+    private String rideStatus;
 }

@@ -66,7 +66,7 @@ public class RideController {
         return ResponseEntity.ok(rideRequestResponseDto);
     }
 
-    @GetMapping("/ride-requests/{userId}")
+    @GetMapping("/ride-requests/user/{userId}")
     public ResponseEntity<List<RideRequestResponseDto>> getAllRideRequests(@PathVariable("userId") int userId) throws UserNotFoundException {
         List<RideRequestResponseDto> rideRequestResponseDtos = rideServiceImplementation.getAllRideRequest(userId);
         return new ResponseEntity<>(rideRequestResponseDtos, HttpStatus.OK);

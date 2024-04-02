@@ -8,7 +8,7 @@ import com.agira.shareDrive.model.User;
 import java.util.List;
 
 public interface UserService {
-    UserResponseDto createUser(UserRequestDto userRequestDto);
+    UserResponseDto createUser(UserRequestDto userRequestDto) throws Exception;
 
     List<UserResponseDto> getAllUsers() throws UserNotFoundException;
 

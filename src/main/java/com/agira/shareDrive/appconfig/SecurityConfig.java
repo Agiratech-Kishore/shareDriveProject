@@ -9,6 +9,8 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.SecurityBuilder;
+import org.springframework.security.config.annotation.SecurityConfigurer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -47,29 +49,46 @@ public class SecurityConfig {
         return authenticationConfiguration.getAuthenticationManager();
     }
 
-    @Bean
-    SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
-
-//        httpSecurity.authorizeHttpRequests(requests -> {
-//            try {
-//                requests
-//                        .requestMatchers("v1/users/login", "v1/users/register").permitAll()
-//                        .and()
-//                        .authorizeHttpRequests().requestMatchers("v1/users").hasRole("ADMIN")
-//                        .requestMatchers(HttpMethod.OPTIONS).permitAll()
-//                        .anyRequest().authenticated()
-////                        .and()
-////                        .authorizeHttpRequests().requestMatchers("v1/ride/**", "v1/users/{id}").authenticated()
-//                        .and().authenticationProvider(authenticationProvider())
-//                        .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-//                        .cors().disable()
-//                        .csrf().disable();
+//    @Override
+//    public void init(HttpSecurity builder) throws Exception {
 //
-//            } catch (Exception exception) {
-//                throw new RuntimeException(exception);
-//            }
-//        });
-//        return httpSecurity.build();
+//    }
+//
+//    @Override
+//    public void configure(HttpSecurity builder) throws Exception {
+//        builder.csrf().disable()
+//                .authorizeRequests()
+//                .requestMatchers(HttpMethod.POST, "/v1/users/login", "/v1/users/register").permitAll()
+//                .requestMatchers(HttpMethod.GET, "/v1/users").hasRole("ADMIN")
+//                .requestMatchers("/v1/ride/**", "/v1/users/{id}", "/v1/vehicles/**", "/v1/ride/{id}").authenticated()
+//                .and()
+//                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+//                .and()
+//                .authenticationProvider(authenticationProvider())
+//                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class).build();
+//    }
+
+//
+    @SneakyThrows
+    public SecurityFilterChain securityFilterChain(HttpSecurity http){
+
+    return http.csrf().disable()
+            .authorizeHttpRequests()
+            .requestMatchers(HttpMethod.POST, "/v1/users/login", "/v1/users/register").permitAll()
+            .and()
+            .authorizeHttpRequests()
+            .requestMatchers(HttpMethod.GET, "/v1/users").hasRole("ADMIN")
+            .and()
+            .authorizeHttpRequests()
+            .requestMatchers("/v1/ride/**", "/v1/users/{id}", "/v1/vehicles/**", "/v1/ride/{id}").authenticated()
+            .and()
+            .sessionManagement()
+            .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            .and()
+            .authenticationProvider(authenticationProvider())
+            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+            .build();
+    }
 
         return httpSecurity.csrf().disable()
                 .authorizeHttpRequests()
