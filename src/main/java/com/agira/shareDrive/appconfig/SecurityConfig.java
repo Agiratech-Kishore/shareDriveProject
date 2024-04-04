@@ -69,25 +69,45 @@ public class SecurityConfig {
 //    }
 
 //
-    @SneakyThrows
-    public SecurityFilterChain securityFilterChain(HttpSecurity http){
+//    @SneakyThrows
+//    public SecurityFilterChain securityFilterChain(HttpSecurity http){
+//
+//    return http.csrf().disable()
+//            .authorizeHttpRequests()
+//            .requestMatchers(HttpMethod.POST, "/v1/users/login", "/v1/users/register").permitAll()
+//            .and()
+////            .authorizeHttpRequests()
+////            .requestMatchers(HttpMethod.GET, "/v1/users").hasRole("ADMIN")
+////            .and()
+//            .authorizeHttpRequests()
+//            .requestMatchers("/v1/ride/**", "/v1/users/{id}", "/v1/vehicles/**", "/v1/ride/{id}").authenticated()
+//            .and()
+//            .sessionManagement()
+//            .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+//            .and()
+//            .authenticationProvider(authenticationProvider())
+//            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+//            .build();
+//    }
 
-    return http.csrf().disable()
-            .authorizeHttpRequests()
-            .requestMatchers(HttpMethod.POST, "/v1/users/login", "/v1/users/register").permitAll()
-            .and()
-            .authorizeHttpRequests()
-            .requestMatchers(HttpMethod.GET, "/v1/users").hasRole("ADMIN")
-            .and()
-            .authorizeHttpRequests()
-            .requestMatchers("/v1/ride/**", "/v1/users/{id}", "/v1/vehicles/**", "/v1/ride/{id}").authenticated()
-            .and()
-            .sessionManagement()
-            .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-            .and()
-            .authenticationProvider(authenticationProvider())
-            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-            .build();
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
+        return httpSecurity
+                .addFilterBefore(exceptionHandlingFilter, UsernamePasswordAuthenticationFilter.class)
+                .csrf().disable()
+                .authorizeHttpRequests()
+                .requestMatchers(HttpMethod.POST, "/v1/users/login", "/v1/users/register").permitAll()
+                .and()
+                .authorizeHttpRequests().requestMatchers(HttpMethod.GET, "v1/users").hasRole("Admin")
+                .and()
+                .authorizeHttpRequests().requestMatchers("v1/ride/**", "v1/users/{id}", "v1/vehicles/**", "v1/ride/{id}").authenticated()
+                .and()
+                .sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and()
+                .authenticationProvider(authenticationProvider())
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .build();
     }
 
         return httpSecurity.csrf().disable()

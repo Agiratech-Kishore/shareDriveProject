@@ -221,7 +221,7 @@ public class RideServiceImplementation implements RideService {
 
     @Override
     public RideResponseDto completeOrCancelRide(Integer rideId, String status) throws RideNotFoundException {
-        Ride ride = rideRepository.findByIdAndRideStatusLike(rideId, RideStatus.CREATED).orElseThrow(() -> new RuntimeException("No Ride found with this id"));
+        Ride ride = rideRepository.findByIdAndRideStatusLike(rideId, RideStatus.CREATED).orElseThrow(() -> new RuntimeException("Ride is already updated or status has been already changed"));
         if(!status.equalsIgnoreCase(RideStatus.COMPLETED) && !status.equalsIgnoreCase(RideStatus.CANCELLED)){
             throw new RuntimeException("Please provide valid option, Completed or Cancelled");
         }
